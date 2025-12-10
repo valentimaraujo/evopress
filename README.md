@@ -35,6 +35,10 @@ DB_PREFIX="evopress"
 ADMIN_EMAIL="admin@evopress.local"
 ADMIN_PASSWORD="admin123"
 ADMIN_NAME="Admin User"
+
+# Autenticação JWT (OBRIGATÓRIO para produção)
+JWT_SECRET="seu-secret-jwt-super-seguro-aqui"
+JWT_EXPIRES_IN="7d"
 ```
 
 ### 4. Setup Completo (Instalação Automática)
@@ -63,6 +67,24 @@ npm run dev
 ```
 
 Acesse **http://localhost:3000**.
+
+### 6. Acessar o Admin
+
+Após o setup, acesse o painel administrativo:
+
+- **URL:** `http://localhost:3000/admin/login`
+- **Credenciais:** Use o email e senha configurados no `.env.local` (ou os padrões)
+
+---
+
+## Rotas Disponíveis
+
+- `/` - Página inicial (pública)
+- `/admin/login` - Login do administrador
+- `/admin` - Dashboard administrativo (protegido)
+- `/admin/posts` - Gerenciamento de posts (protegido)
+- `/admin/media` - Gerenciamento de mídia (protegido)
+- `/admin/users` - Gerenciamento de usuários (protegido)
 
 ---
 
