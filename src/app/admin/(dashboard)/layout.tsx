@@ -4,6 +4,15 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { getSessionCookie } from '@/core/utils/cookies';
 import { verifyToken } from '@/core/utils/auth';
+import React from 'react';
+import { 
+  LayoutDashboard, 
+  FileText, 
+  Image as ImageIcon, 
+  Users, 
+  LogOut, 
+  Settings 
+} from 'lucide-react';
 
 async function getCurrentUser() {
   const token = await getSessionCookie();
@@ -21,37 +30,76 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const systemName = prefix === 'evopress' ? 'EvoPress' : prefix.toUpperCase();
   const user = await getCurrentUser();
 
+  const menuItems = [
+    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/posts', label: 'Posts', icon: FileText },
+    { href: '/admin/media', label: 'Mídia', icon: ImageIcon },
+    { href: '/admin/users', label: 'Usuários', icon: Users },
+  ];
+
   return (
-    <div className="flex h-screen bg-zinc-100 dark:bg-zinc-950">
-      <aside className="w-64 border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 flex flex-col">
-        <div className="flex h-16 items-center px-6 font-bold text-zinc-900 dark:text-white border-b border-zinc-200 dark:border-zinc-800">
-          {systemName}
+    <div className="flex h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      {/* Sidebar */}
+      <aside className="w-72 border-r border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900 flex flex-col">
+        {/* Header da Sidebar */}
+        <div className="flex h-20 items-center px-8">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
+              {systemName.charAt(0)}
+            </div>
+            <span className="text-xl font-bold tracking-tight text-zinc-800 dark:text-white">
+              {systemName}
+            </span>
+          </div>
         </div>
         
-        <nav className="flex-1 p-4 space-y-1">
-          <Link href="/admin" className="block rounded-md p-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800">
-            Dashboard
-          </Link>
-          <Link href="/admin/posts" className="block rounded-md p-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800">
-            Posts
-          </Link>
-          <Link href="/admin/users" className="block rounded-md p-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800">
-            Usuários
-          </Link>
+        {/* Navegação */}
+        <nav className="flex-1 px-4 py-6 space-y-1">
+          <p className="px-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">
+            Menu
+          </p>
+          {menuItems.map((item) => (
+            <Link 
+              key={item.href}
+              href={item.href} 
+              className="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-zinc-600 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+            >
+              <item.icon className="h-5 w-5 text-zinc-400 transition-colors group-hover:text-indigo-600 dark:text-zinc-500 dark:group-hover:text-white" />
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-          <div className="mb-2 text-sm font-medium text-zinc-900 dark:text-white">
-            {user?.name || 'Admin'}
+        {/* Footer da Sidebar (Perfil) */}
+        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
+          <div className="flex items-center gap-3 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-semibold dark:bg-indigo-900/30 dark:text-indigo-400">
+              {user?.name?.charAt(0) || 'A'}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="truncate text-sm font-medium text-zinc-900 dark:text-white">
+                {user?.name || 'Admin'}
+              </p>
+              <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                {user?.email}
+              </p>
+            </div>
+            <a 
+              href="/api/auth/logout" 
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-white hover:text-red-500 hover:shadow-sm transition-all dark:hover:bg-zinc-700"
+              title="Sair"
+            >
+              <LogOut className="h-4 w-4" />
+            </a>
           </div>
-          <a href="/api/auth/logout" className="block w-full rounded-md border border-zinc-300 bg-white px-4 py-2 text-center text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
-            Sair
-          </a>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto p-8">
-        {children}
+      {/* Área Principal */}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden p-8 lg:p-12">
+        <div className="mx-auto max-w-6xl">
+          {children}
+        </div>
       </main>
     </div>
   );
