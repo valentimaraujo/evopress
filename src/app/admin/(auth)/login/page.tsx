@@ -23,13 +23,14 @@ export default function LoginPage() {
       });
 
       if (!res.ok) {
-        throw new Error('Credenciais inválidas');
+        const data = await res.json();
+        throw new Error(data.error || 'Credenciais inválidas');
       }
 
       // Hard navigation para garantir atualização dos cookies
       window.location.href = '/admin';
-    } catch {
-      setError('Falha no login. Verifique seus dados.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Falha no login');
       setLoading(false);
     }
   }

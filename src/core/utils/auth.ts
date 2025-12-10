@@ -1,21 +1,26 @@
-import jwt from 'jsonwebtoken';
 import { compare } from 'bcryptjs';
+import { SignJWT, jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-dev-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'evopress-dev-secret-key-123';
+const key = new TextEncoder().encode(JWT_SECRET);
 
 export async function verifyPassword(plain: string, hashed: string): Promise<boolean> {
   return compare(plain, hashed);
 }
 
-export function signToken(payload: object): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+export async function signToken(payload: any): Promise<string> {
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(key);
 }
 
-export function verifyToken(token: string) {
+export async function verifyToken(token: string) {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, key);
+    return payload;
   } catch {
     return null;
   }
 }
-

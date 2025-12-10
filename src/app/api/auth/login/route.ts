@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Credenciais inválidas' }, { status: 401 });
     }
 
-    const token = signToken({ sub: user.uuid, email: user.email, role: user.role });
+    const token = await signToken({ sub: user.uuid, email: user.email, role: user.role });
     await setSessionCookie(token);
 
     return NextResponse.json({ success: true });

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from './core/utils/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Ignora rotas públicas e estáticas
@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   }
 
   const token = request.cookies.get('evopress_session')?.value;
-  const isValid = token ? verifyToken(token) : null;
+  const isValid = token ? await verifyToken(token) : null;
 
   // Se já está logado e tenta acessar login -> dashboard
   if (pathname === '/admin/login' && isValid) {
