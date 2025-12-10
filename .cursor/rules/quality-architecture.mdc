@@ -1,0 +1,69 @@
+---
+description: Padrões de Qualidade e Arquitetura Next.js/Headless
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+---
+
+# Padrões de Qualidade e Arquitetura EvoPress
+
+Este documento define as regras fundamentais para garantir a máxima qualidade, estabilidade e manutenibilidade do projeto EvoPress.
+
+## 1. Ferramentas de Linting e Qualidade de Código (ESLint)
+
+A performance e o SEO devem ser garantidos no nível do código.
+
+- **SEO e Core Web Vitals:** O projeto utiliza o preset `next/core-web-vitals` para prevenir anti-padrões.
+  - **Bloqueio de Imagens Não Otimizadas:** Use sempre o componente `<Image />` do Next.js. Nunca use a tag `<img>` padrão, exceto se explicitamente necessário e justificado.
+  - **Scripts Otimizados:** Use o componente `<Script />` com a estratégia de carregamento correta (`beforeInteractive`, `afterInteractive`, `lazyOnload`). Evite tags `<script>` síncronas.
+
+- **Otimização de Build:** O projeto depende do compilador SWC/Turbopack. Evite configurações manuais de Babel ou Webpack que desativem o compilador Rust.
+
+## 2. Tipagem e Governança (TypeScript)
+
+O TypeScript é obrigatório e rigoroso em todo o stack.
+
+- **Tipagem Estrita:** Não utilize `any`. Route Handlers, componentes e funções utilitárias devem ser estritamente tipados.
+- **Contrato de API Estrito:**
+  - As interfaces definidas em `src/core/types` devem ser a única fonte de verdade.
+  - O Backend (Supabase/Database) e o Frontend devem compartilhar as mesmas definições de tipos geradas a partir do Schema.
+- **Estabilidade de Plugins:**
+  - Todo componente dinâmico ou injetado deve seguir interfaces estritas definidas no Core.
+  - A comunicação com o BFF deve ser tipada.
+
+## 3. Estrutura de Código e Padrões de Design
+
+- **Server Components First:**
+  - Se o dado é usado apenas para renderização inicial e não precisa de interação do usuário, use **Server Components**.
+  - **NÃO crie APIs** apenas para buscar dados que podem ser buscados diretamente no Server Component.
+  - Use `fetch` diretamente no componente com cache configurado.
+
+- **Backend-for-Frontend (BFF):**
+  - Use Route Handlers (`src/app/api`) como BFF para consolidar dados, transformar respostas ou proteger chaves de API.
+  - Encapsule lógica repetitiva (auth, logging) em funções de Higher-Order ou middlewares reutilizáveis.
+
+- **Camada de Acesso a Dados (DAL):**
+  - Centralize a lógica de banco de dados e regras de negócio em `src/core/services`.
+  - Server Actions e Route Handlers devem chamar esses serviços, nunca acessar o banco diretamente com lógica duplicada.
+
+## 4. Segurança e Isolamento
+
+- **Isolamento de Credenciais:**
+  - Chaves secretas (`SUPABASE_SERVICE_ROLE_KEY`, etc.) **NUNCA** devem ser expostas ao cliente (prefixo `NEXT_PUBLIC_` apenas para variáveis públicas).
+  - Use o BFF para mediar chamadas que exigem privilégios elevados.
+
+- **Prevenção de Vazamento (Tainting):**
+  - Em funções que manipulam dados sensíveis no servidor, use o padrão de "Taint" (ou garanta que o objeto não seja serializado para o cliente) para evitar vazamento acidental.
+
+- **Carregamento Assíncrono:**
+  - Componentes pesados ou não essenciais devem ser carregados com `lazy` ou `dynamic` para garantir que o Core Web Vitals (LCP/FID) permaneça otimizado.
+
+## 5. Convenções de Código
+
+- **Nomenclatura:**
+  - Componentes: `PascalCase` (ex: `HeroSection.tsx`)
+  - Funções/Variáveis: `camelCase` (ex: `fetchUserData`)
+  - Constantes: `UPPER_SNAKE_CASE` (ex: `MAX_RETRIES`)
+  - Arquivos de Rotas: `page.tsx`, `layout.tsx`, `route.ts`, `loading.tsx`, `error.tsx`
+
+- **Importações:**
+  - Use alias `@/` para imports internos.
+  - Agrupe imports: 1. Bibliotecas externas, 2. Core (types/utils), 3. Componentes locais.

@@ -1,0 +1,58 @@
+---
+description: Regras de Comentários e Documentação de Código
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
+# Regras de Comentários e Documentação
+
+**CRÍTICO PARA AGENTES:** Este projeto será distribuído publicamente. Comentários e mensagens devem ser profissionais, necessários e SEM elementos visuais.
+
+## PROIBIDO ABSOLUTAMENTE
+
+1. **Emojis/Ícones em QUALQUER lugar:**
+   - ❌ Comentários de código
+   - ❌ Mensagens `console.log`, `console.error`, `console.warn`
+   - ❌ Strings de texto no código
+   - ❌ Mensagens de erro
+   - ❌ Documentação inline
+
+2. **Comentários Óbvios:** Não comente o que o código já deixa claro.
+
+3. **Comentários Temporários:** Não deixe `// TODO`, `// FIXME`, `// HACK`, `// XXX` sem implementação.
+
+4. **Comentários de Debug:** Remova `console.log` de debug antes de commitar.
+
+## PERMITIDO
+
+1. **Documentação de Funções Complexas:** Explique **por quê** algo é feito, não **o quê**.
+2. **Comentários de Contexto:** Quando a lógica não é óbvia ou há decisão arquitetural importante.
+3. **JSDoc/TSDoc:** Use JSDoc para funções públicas e APIs expostas.
+
+## Exemplos
+
+### ERRADO (NUNCA FAÇA ISSO)
+
+```typescript
+// 🚀 Cria o usuário admin
+console.log('✅ Seed concluído!');
+console.error('❌ Erro no seed:', error);
+// TODO: melhorar isso depois
+```
+
+### CORRETO
+
+```typescript
+/**
+ * Cria o usuário administrador inicial do sistema.
+ * Usa valores de ADMIN_EMAIL e ADMIN_PASSWORD do .env ou padrões.
+ */
+console.log('Seed concluído.');
+console.error('Erro no seed:', error);
+```
+
+## Regra de Ouro para Agentes
+
+**"Se você pensou em adicionar um emoji, NÃO ADICIONE. O código deve ser claro sem elementos visuais."**
+
+Comentários explicam o **porquê**, não o **quê**. O código já diz o que está sendo feito.

@@ -1,0 +1,59 @@
+---
+description: Padrões de Git e Commits
+globs: ["**/*"]
+---
+
+# Padrões de Git e Workflow
+
+Este projeto segue padrões estritos de versionamento e commits para garantir histórico limpo e rastreabilidade.
+
+## 1. Regras de Commit
+
+### Formato da Mensagem
+O padrão exigido para mensagens de commit é:
+`type: subject`
+
+- **type**: Um dos tipos permitidos (ver abaixo).
+- **subject**: Descrição sucinta em **português**, lowercase, sem ponto final, máx 100 caracteres.
+
+### Tipos Permitidos
+- `feat`: Nova funcionalidade
+- `fix`: Correção de bug
+- `docs`: Documentação
+- `style`: Formatação, pontos e vírgulas (sem alteração de código)
+- `refactor`: Refatoração de código (sem nova funcionalidade ou correção)
+- `test`: Adição ou correção de testes
+- `chore`: Atualização de build, ferramentas, dependências
+- `revert`: Reverter mudanças anteriores
+
+### Exemplos
+✅ `feat: criar componente de login`
+✅ `fix: corrigir erro de validação no formulário`
+✅ `docs: atualizar readme com instruções de setup`
+
+❌ `Adicionado login` (Falta tipo)
+❌ `feat: Criar componente.` (Uppercase, ponto final)
+
+## 2. Fluxo de Trabalho (Workflow)
+
+- **Branches:**
+  - `main`: Código estável e validado.
+  - `feat/nome-da-feature`: Para novas funcionalidades.
+  - `fix/nome-do-bug`: Para correções.
+
+- **Pull Requests:**
+  - Todo código deve passar por PR antes de ir para `main`.
+  - PRs devem ser pequenos e focados.
+
+## 3. Comandos do Agente
+
+Quando solicitado a gerar commits:
+1. Responda em Português.
+2. Siga as regras acima.
+3. Mostre o comando completo: `git commit -m "type: subject"`
+4. Apresente em bloco de código sem explicações desnecessárias.
+
+**Exemplo de resposta do Agente:**
+```bash
+git commit -m "feat: implementar rota de cadastro de usuários"
+```

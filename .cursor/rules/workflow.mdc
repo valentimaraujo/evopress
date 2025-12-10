@@ -1,0 +1,51 @@
+---
+description: Protocolo de Workflow e Definição de Pronto (DoD)
+globs: ["**/*.ts", "**/*.tsx"]
+---
+
+# 🔄 WORKFLOW & AUTO-CORRECTION RULES
+
+Estas regras definem o protocolo de "Definition of Done" e "Auto-Correction" que o Agente DEVE seguir.
+
+## ✅ DEFINITION OF DONE (DoD)
+
+**Antes de considerar uma tarefa concluída, você DEVE:**
+
+1. **Rodar Verificação de Lint (`read_lints`):**
+   - Verificar TODOS os arquivos modificados.
+   - Corrigir TODOS os erros encontrados (proativamente).
+   - Máximo de 3 tentativas de auto-correção por arquivo.
+
+2. **Verificar Qualidade do Código:**
+   - **Zero** `console.log`, `console.error` (use logger apropriado se necessário).
+   - **Zero** comentários `TODO`, `FIXME`, `XXX` (implemente ou remova).
+   - **Zero** código comentado.
+   - Tipagem explícita (sem `any`).
+
+3. **Verificar Arquitetura (DDD/BFF):**
+   - Lógica de negócio isolada em `src/core/services` ou `src/admin/services`.
+   - Route Handlers (`api/**`) atuando apenas como proxies/controllers.
+   - Validação de entrada usando Zod/Yup.
+
+## 🔧 PROTOCOLO DE AUTO-CORREÇÃO
+
+### Quando o Linter encontrar erros:
+
+1. **Primeira Tentativa:** Corrigir erros automaticamente (formatar, imports, tipos).
+2. **Segunda Tentativa:** Se persistir, analisar se é falso-positivo ou erro real. Corrigir.
+3. **Terceira Tentativa:** Se persistir, PARE e reporte ao usuário. **NÃO entre em loop infinito.**
+
+### Detecção de Loops Infinitos
+- Se o mesmo erro aparecer 3 vezes: PARE.
+- Se a correção do Erro A causa o Erro B, e a correção do Erro B traz o Erro A de volta: PARE.
+
+## 📋 CHECKLIST PRÉ-RESPOSTA
+
+Antes de finalizar sua resposta:
+- [ ] Rodou `read_lints` nos arquivos modificados?
+- [ ] Corrigiu erros de import order?
+- [ ] Removeu variáveis não usadas?
+- [ ] Garantiu que não há `console.log`?
+- [ ] Validou a estrutura de pastas?
+
+**CRÍTICO:** Se `read_lints` mostrar QUALQUER erro, você deve corrigir antes de marcar como "Concluído".

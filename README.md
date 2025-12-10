@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EvoPress
 
-## Getting Started
+EvoPress é um CMS moderno, construído com Next.js 16, Drizzle ORM e arquitetura Headless/BFF, desenhado para ser uma alternativa robusta e escalável ao WordPress.
 
-First, run the development server:
+## 🚀 Como Começar (Instalação Rápida)
+
+Siga os passos abaixo para rodar o projeto localmente.
+
+### 1. Pré-requisitos
+- Node.js 18+
+- Banco de Dados PostgreSQL (Supabase, Neon, Docker ou Local)
+
+### 2. Instalação
+
+Clone o repositório e instale as dependências:
+
+```bash
+git clone https://github.com/seu-usuario/evopress.git
+cd evopress
+npm install
+```
+
+### 3. Configuração do Banco de Dados
+
+Crie um arquivo `.env.local` na raiz do projeto e adicione a URL de conexão do seu Postgres:
+
+```env
+# Conexão com o Banco de Dados (OBRIGATÓRIO)
+DATABASE_URL="postgres://usuario:senha@localhost:5432/nome_do_banco"
+
+# Opcional: Prefixo das tabelas (Padrão: evopress)
+DB_PREFIX="evopress"
+
+# Opcional: Credenciais do Admin Inicial (Padrão: admin@evopress.local / admin123)
+ADMIN_EMAIL="admin@evopress.local"
+ADMIN_PASSWORD="admin123"
+ADMIN_NAME="Admin User"
+```
+
+### 4. Setup Completo (Instalação Automática)
+
+Execute o comando de setup que faz **tudo automaticamente**:
+- Cria as tabelas no banco de dados
+- Adiciona índices de performance (GIN)
+- Cria o usuário admin inicial
+
+```bash
+npm run setup
+```
+
+**Usuário Admin criado:**
+- Email: Configurado via `ADMIN_EMAIL` (padrão: `admin@evopress.local`)
+- Senha: Configurado via `ADMIN_PASSWORD` (padrão: `admin123`)
+
+> ⚠️ **Importante:** Configure `ADMIN_EMAIL` e `ADMIN_PASSWORD` no `.env.local` antes do setup, ou altere a senha após o primeiro login!
+
+### 5. Rodar o Projeto
+
+Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse **http://localhost:3000**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Comandos Úteis
 
-## Learn More
+- `npm run setup`: **Setup completo** (instala deps + cria banco + seed inicial)
+- `npm run db:push`: Sincroniza o schema com o banco (cria/atualiza tabelas)
+- `npm run db:seed`: Cria usuário admin e índices GIN
+- `npm run db:generate`: Gera arquivos SQL de migration baseados no schema
+- `npm run db:migrate`: Aplica as migrations pendentes
+- `npm run db:studio`: Abre o Drizzle Studio para visualizar/editar o banco
+- `npm run lint`: Verifica a qualidade do código
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗️ Arquitetura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+O projeto segue uma arquitetura Modular Monolith:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/core`: Lógica de negócio, serviços e tipos compartilhados.
+- `src/admin`: Interface administrativa.
+- `src/theme`: Componentes de renderização do site público.
+- `src/db`: Schema e configuração do banco de dados (Drizzle).
 
-## Deploy on Vercel
+## 📄 Licença
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT

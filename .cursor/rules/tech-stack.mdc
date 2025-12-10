@@ -1,0 +1,41 @@
+---
+description: Stack Tecnológico e Bibliotecas Permitidas
+globs: ["package.json", "**/*.ts", "**/*.tsx"]
+---
+
+# 🛠️ TECH STACK & UTILITIES
+
+Este arquivo define as tecnologias permitidas e utilitários preferidos para evitar reinvenção da roda.
+
+## STACK PERMITIDO
+
+### Dependências Core (NÃO ADICIONE OUTRAS SEM APROVAÇÃO)
+- **Framework:** Next.js 16 (App Router)
+- **UI:** React 19
+- **Linguagem:** TypeScript 5
+- **Estilização:** Tailwind CSS 4
+- **Backend/Auth:** Supabase (`@supabase/supabase-js`, `@supabase/ssr`) - Apenas para Auth.
+- **Banco de Dados:** Postgres (via **Drizzle ORM**) - Database Agnostic.
+- **Validação:** Yup (ou Zod, se preferir consistência com projetos novos) - *Definido: Yup conforme regras antigas, mas Zod é mais comum em Next moderno. Manteremos Yup por consistência com EvoTools se desejado, ou migrar para Zod.* -> **Decisão: Zod** (Moderno, inferência de tipos melhor).
+- **Datas:** `date-fns` (NUNCA use moment.js)
+- **Ícones:** Lucide React (padrão moderno)
+
+### Bibliotecas Proibidas ❌
+- `lodash` (Use nativo ou utils específicos)
+- `moment` / `moment-timezone` (Use `date-fns`)
+- `axios` (Use `fetch` nativo)
+- `express` (Next.js handles routing)
+
+## UTILITÁRIOS PREFERIDOS
+
+Antes de criar nova função, verifique `src/core/utils/`:
+
+1. **API Helpers:** `formatJSONResponse`
+2. **Date Utils:** Use `date-fns` diretamente ou helpers em `src/core/utils/date.ts`
+3. **Formatters:** `src/core/utils/formatters.ts` (Moeda, Telefone, CPF/CNPJ)
+
+## REGRAS ANTI-ALUCINAÇÃO
+
+1. **NÃO importe** bibliotecas que não estão no `package.json`.
+2. **NÃO crie** funções utilitárias que já existem no Core.
+3. **SEMPRE** use `fetch` com cache do Next.js ao invés de bibliotecas externas.

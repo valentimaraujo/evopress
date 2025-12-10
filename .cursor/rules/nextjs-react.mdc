@@ -1,0 +1,34 @@
+---
+description: Regras de Engenharia Next.js e React
+globs: ["**/*.tsx", "**/*.jsx"]
+---
+
+# Regras de Engenharia Next.js e React
+
+Estas regras complementam os padrões de qualidade focando especificamente em boas práticas de React e Next.js App Router.
+
+## React Server Components (RSC)
+
+- **Padrão:** Todo componente é Server Component por padrão.
+- **Diretiva 'use client':** Adicione `'use client'` no topo do arquivo **apenas** se o componente precisar de:
+  - Hooks (`useState`, `useEffect`, `useContext`, etc.)
+  - Event Listeners (`onClick`, `onChange`, etc.)
+  - APIs exclusivas do browser (`window`, `document`, `localStorage`)
+- **Separação:** Mova a lógica interativa para componentes "folha" (leaf components) menores, mantendo o layout e a busca de dados no Server Component pai.
+
+## Gerenciamento de Estado
+
+- **URL as State:** Prefira usar a URL (search params) para gerenciar estado global de UI (filtros, paginação, abas) em vez de Context ou Redux. Isso garante que o estado seja compartilhável e preservado no reload.
+- **Server State:** Use React Query ou SWR apenas se necessário. O Next.js (`fetch` com cache) já resolve a maioria dos casos de "Server State".
+
+## Performance
+
+- **Imagens:** Sempre especifique `width` e `height` ou use `fill` com um container pai relativo.
+- **Fontes:** Use `next/font` para otimização automática de fontes e prevenção de Layout Shift.
+- **Links:** Use o componente `<Link>` do Next.js para navegação interna. Nunca use `<a>` para links internos (causa full page reload).
+
+## Tratamento de Erros
+
+- Use arquivos `error.tsx` para capturar erros em segmentos de rota.
+- Use arquivos `not-found.tsx` para tratar erros 404 customizados.
+- Em Server Actions, retorne objetos de erro estruturados `{ success: boolean, message: string, errors?: any }` em vez de apenas lançar exceções.
