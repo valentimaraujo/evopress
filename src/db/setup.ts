@@ -55,7 +55,7 @@ async function setup() {
 
       console.log('Usuário Admin criado com sucesso:');
       console.log(`Email: ${adminEmail}`);
-      console.log(`Senha: ${adminPassword}`);
+      console.log('(Altere a senha após o primeiro login!)');
     }
 
     console.log('Setup concluído com sucesso.');

@@ -86,8 +86,7 @@ async function main() {
 
         console.log('\n✅ ADMIN CRIADO COM SUCESSO!');
         console.log(`   Email: ${adminEmail}`);
-        console.log(`   Senha: ${adminPassword}`);
-        console.log('   (Altere esta senha após o login!)');
+        console.log('   (Altere a senha após o primeiro login!)');
       }
 
     } finally {

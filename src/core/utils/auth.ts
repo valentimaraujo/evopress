@@ -1,7 +1,22 @@
 import { compare } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'evopress-dev-secret-key-123';
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'JWT_SECRET não configurado! Configure a variável JWT_SECRET no ambiente de produção.'
+      );
+    }
+    return 'evopress-dev-secret-key-123';
+  }
+  
+  return secret;
+};
+
+const JWT_SECRET = getJwtSecret();
 const key = new TextEncoder().encode(JWT_SECRET);
 
 export async function verifyPassword(plain: string, hashed: string): Promise<boolean> {

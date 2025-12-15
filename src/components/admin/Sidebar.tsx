@@ -19,12 +19,15 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 interface SidebarProps {
   systemName: string;
-  userName: string;
-  userEmail: string;
+  user: { name: string; email: string } | null;
+  isCollapsed?: boolean;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ systemName, userName, userEmail }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onToggle }: SidebarProps) {
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const collapsed = externalCollapsed !== undefined ? externalCollapsed : internalCollapsed;
+  const handleToggle = onToggle || (() => setInternalCollapsed(!internalCollapsed));
   const pathname = usePathname();
 
   const menuItems = [
@@ -39,7 +42,7 @@ export function Sidebar({ systemName, userName, userEmail }: SidebarProps) {
       {/* Mobile Toggle */}
       <div className="fixed top-4 left-4 z-50 lg:hidden">
         <button 
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={handleToggle}
           className="rounded-lg bg-white p-2 shadow-md dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
         >
           <Menu className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
@@ -105,42 +108,44 @@ export function Sidebar({ systemName, userName, userEmail }: SidebarProps) {
             
             <ThemeToggle collapsed={collapsed} />
 
-            <div className={clsx(
-              "flex items-center gap-3 rounded-xl bg-zinc-50 p-2 dark:bg-zinc-800/50 transition-all duration-300",
-              collapsed ? "justify-center bg-transparent p-0" : ""
-            )}>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-semibold dark:bg-indigo-900/30 dark:text-indigo-400 shrink-0">
-                {userName.charAt(0)}
-              </div>
-              
+            {user && (
               <div className={clsx(
-                "flex-1 overflow-hidden transition-[opacity,width] duration-300 ease-in-out",
-                collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-full"
+                "flex items-center gap-3 rounded-xl bg-zinc-50 p-2 dark:bg-zinc-800/50 transition-all duration-300",
+                collapsed ? "justify-center bg-transparent p-0" : ""
               )}>
-                <p className="truncate text-sm font-medium text-zinc-900 dark:text-white">
-                  {userName}
-                </p>
-                <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                  {userEmail}
-                </p>
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 font-semibold dark:bg-indigo-900/30 dark:text-indigo-400 shrink-0">
+                  {user.name.charAt(0)}
+                </div>
+                
+                <div className={clsx(
+                  "flex-1 overflow-hidden transition-[opacity,width] duration-300 ease-in-out",
+                  collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-full"
+                )}>
+                  <p className="truncate text-sm font-medium text-zinc-900 dark:text-white">
+                    {user.name}
+                  </p>
+                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                    {user.email}
+                  </p>
+                </div>
+                
+                {!collapsed && (
+                  <a 
+                    href="/api/auth/logout" 
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-white hover:text-red-500 hover:shadow-sm transition-all dark:hover:bg-zinc-700 shrink-0"
+                    title="Sair"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </a>
+                )}
               </div>
-              
-              {!collapsed && (
-                <a 
-                  href="/api/auth/logout" 
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-white hover:text-red-500 hover:shadow-sm transition-all dark:hover:bg-zinc-700 shrink-0"
-                  title="Sair"
-                >
-                  <LogOut className="h-4 w-4" />
-                </a>
-              )}
-            </div>
+            )}
           </div>
         </aside>
 
         {/* Botão de Toggle Flutuante na Borda */}
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={handleToggle}
           className="hidden lg:flex absolute -right-3 top-20 z-50 h-6 w-6 items-center justify-center rounded-full border-2 border-zinc-200 bg-white shadow-md transition-all hover:scale-110 hover:shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
           title={collapsed ? 'Expandir menu' : 'Recolher menu'}
         >
