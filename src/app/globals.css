@@ -18,3 +18,22 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Tiptap Editor Overrides for Full Height */
+.ProseMirror {
+  min-height: 100% !important;
+  height: 100% !important;
+  outline: none !important;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9ca3af;
+  pointer-events: none;
+  height: 0;
+}
+
+.tiptap {
+  height: 100%;
+}
