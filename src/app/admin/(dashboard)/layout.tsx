@@ -30,10 +30,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       />
 
       {/* Área Principal */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden p-8 lg:p-12 transition-all duration-300">
-        <div className="mx-auto max-w-6xl">
-          {children}
-        </div>
+      <main className="flex-1 overflow-y-auto overflow-x-hidden transition-all duration-300">
+        {children}
       </main>
     </div>
   );
