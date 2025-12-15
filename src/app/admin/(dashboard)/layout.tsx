@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm';
+import React from 'react';
 
 import { Sidebar } from '@/components/admin/Sidebar';
 import { verifyToken } from '@/core/utils/auth';
@@ -24,10 +25,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 overflow-hidden">
-      <Sidebar 
-        systemName={systemName} 
-        userName={user?.name || 'Admin'} 
-        userEmail={user?.email || ''} 
+      <Sidebar
+        systemName={systemName}
+        user={user}
       />
 
       {/* Área Principal */}
