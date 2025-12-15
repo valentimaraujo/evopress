@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { ButtonBlock } from './blocks/ButtonBlock';
+import { ColumnsBlock } from './blocks/ColumnsBlock';
 import { DividerBlock } from './blocks/DividerBlock';
 import { HeadingBlock } from './blocks/HeadingBlock';
 import { ImageBlock } from './blocks/ImageBlock';
@@ -61,6 +62,15 @@ export function renderBlock(
       );
     case 'divider':
       return <DividerBlock block={block} isEditing={isEditing} onChange={onChange} />;
+    case 'columns':
+      return (
+        <ColumnsBlock
+          block={block}
+          isEditing={isEditing}
+          onChange={onChange}
+          onUploadImage={onUploadImage}
+        />
+      );
     default:
       return <div>Tipo de bloco desconhecido</div>;
   }

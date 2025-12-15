@@ -51,7 +51,19 @@ export function BlockEditor({ blocks, onChange, onUploadImage }: BlockEditorProp
     if (active.id.toString().startsWith('sidebar-')) {
       const blockType = active.id.toString().replace('sidebar-', '') as ContentBlock['type'];
       const newBlock = createBlock(blockType) as ContentBlock;
-      onChange([...blocks, newBlock]);
+
+      if (over.id === 'canvas') {
+        onChange([...blocks, newBlock]);
+      } else {
+        const targetIndex = blocks.findIndex((block) => block.id === over.id);
+        if (targetIndex !== -1) {
+          const newBlocks = [...blocks];
+          newBlocks.splice(targetIndex, 0, newBlock);
+          onChange(newBlocks);
+        } else {
+          onChange([...blocks, newBlock]);
+        }
+      }
     } else if (active.id !== over.id) {
       const oldIndex = blocks.findIndex((block) => block.id === active.id);
       const newIndex = blocks.findIndex((block) => block.id === over.id);

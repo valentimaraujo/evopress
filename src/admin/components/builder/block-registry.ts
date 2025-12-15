@@ -58,6 +58,19 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
       type: 'divider',
     } as unknown as Omit<ContentBlock, 'id'>,
   },
+  columns: {
+    type: 'columns',
+    label: 'Colunas',
+    icon: '📊',
+    defaultData: {
+      type: 'columns',
+      columnCount: 2,
+      columns: [
+        { id: 'col-1', width: 50, blocks: [] },
+        { id: 'col-2', width: 50, blocks: [] },
+      ],
+    } as unknown as Omit<ContentBlock, 'id'>,
+  },
 };
 
 export function createBlock(type: BlockType, id?: string) {

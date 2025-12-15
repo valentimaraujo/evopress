@@ -4,7 +4,8 @@ export type BlockType =
   | 'image'
   | 'button'
   | 'spacer'
-  | 'divider';
+  | 'divider'
+  | 'columns';
 
 export interface BaseBlock {
   id: string;
@@ -44,13 +45,24 @@ export interface DividerBlock extends BaseBlock {
   type: 'divider';
 }
 
+export interface ColumnsBlock extends BaseBlock {
+  type: 'columns';
+  columns: Array<{
+    id: string;
+    width: number;
+    blocks: ContentBlock[];
+  }>;
+  columnCount: 2 | 3 | 4;
+}
+
 export type ContentBlock =
   | HeadingBlock
   | ParagraphBlock
   | ImageBlock
   | ButtonBlock
   | SpacerBlock
-  | DividerBlock;
+  | DividerBlock
+  | ColumnsBlock;
 
 export interface BlockDefinition {
   type: BlockType;
