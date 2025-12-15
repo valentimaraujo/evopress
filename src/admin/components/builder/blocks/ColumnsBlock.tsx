@@ -1,6 +1,6 @@
 'use client';
 
-import { Columns2, Columns3, Columns4, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { renderBlock } from '../block-renderer';
@@ -16,6 +16,7 @@ interface ColumnsBlockProps {
 
 export function ColumnsBlock({ block, isEditing, onChange, onUploadImage }: ColumnsBlockProps) {
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleColumnCountChange = (count: 2 | 3 | 4) => {
     const newColumns = Array.from({ length: count }, (_, i) => {
@@ -84,7 +85,7 @@ export function ColumnsBlock({ block, isEditing, onChange, onUploadImage }: Colu
                 type="button"
                 title="2 Colunas"
               >
-                <Columns2 className="h-4 w-4" />
+                <span className="text-sm font-semibold">2</span>
               </button>
               <button
                 onClick={() => handleColumnCountChange(3)}
@@ -96,7 +97,7 @@ export function ColumnsBlock({ block, isEditing, onChange, onUploadImage }: Colu
                 type="button"
                 title="3 Colunas"
               >
-                <Columns3 className="h-4 w-4" />
+                <span className="text-sm font-semibold">3</span>
               </button>
               <button
                 onClick={() => handleColumnCountChange(4)}
@@ -108,7 +109,7 @@ export function ColumnsBlock({ block, isEditing, onChange, onUploadImage }: Colu
                 type="button"
                 title="4 Colunas"
               >
-                <Columns4 className="h-4 w-4" />
+                <span className="text-sm font-semibold">4</span>
               </button>
             </div>
           </div>
@@ -162,25 +163,55 @@ export function ColumnsBlock({ block, isEditing, onChange, onUploadImage }: Colu
     );
   }
 
+  const totalBlocks = block.columns.reduce((sum, col) => sum + col.blocks.length, 0);
+
   return (
-    <div className="grid gap-4 p-4" style={{ gridTemplateColumns: `repeat(${block.columnCount}, 1fr)` }}>
-      {block.columns.map((column) => (
-        <div key={column.id} className="min-h-[100px]">
-          {column.blocks.length === 0 ? (
-            <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800">
-              <span className="text-sm">Coluna vazia</span>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {column.blocks.map((colBlock) => (
-                <div key={colBlock.id}>
-                  {renderBlock(colBlock, false, () => {}, onUploadImage)}
-                </div>
-              ))}
-            </div>
+    <div className="w-full rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
+        type="button"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-semibold text-zinc-700 dark:text-zinc-300">
+            {block.columnCount === 2 ? '▦' : block.columnCount === 3 ? '▥' : '▤'}
+          </span>
+          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {block.columnCount} Colunas
+          </span>
+          {totalBlocks > 0 && (
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              ({totalBlocks} {totalBlocks === 1 ? 'bloco' : 'blocos'})
+            </span>
           )}
         </div>
-      ))}
+        {isExpanded ? (
+          <ChevronUp className="h-4 w-4 text-zinc-400" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-zinc-400" />
+        )}
+      </button>
+      {isExpanded && (
+        <div className="grid gap-3 border-t border-zinc-200 p-3 dark:border-zinc-700" style={{ gridTemplateColumns: `repeat(${block.columnCount}, 1fr)` }}>
+          {block.columns.map((column) => (
+            <div key={column.id} className="min-h-[50px]">
+              {column.blocks.length === 0 ? (
+                <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800">
+                  <span className="text-xs">Vazia</span>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {column.blocks.map((colBlock) => (
+                    <div key={colBlock.id}>
+                      {renderBlock(colBlock, false, () => {}, onUploadImage)}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -23,7 +23,7 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   image: {
     type: 'image',
     label: 'Imagem',
-    icon: '🖼',
+    icon: '▦',
     defaultData: {
       type: 'image',
       url: '',
@@ -33,7 +33,7 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   button: {
     type: 'button',
     label: 'Botão',
-    icon: '🔘',
+    icon: '◉',
     defaultData: {
       type: 'button',
       text: 'Clique aqui',
@@ -61,7 +61,7 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   columns: {
     type: 'columns',
     label: 'Colunas',
-    icon: '📊',
+    icon: '▥',
     defaultData: {
       type: 'columns',
       columnCount: 2,
