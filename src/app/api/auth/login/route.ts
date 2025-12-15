@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
-import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { verifyPassword, signToken } from '@/core/utils/auth';
 import { setSessionCookie } from '@/core/utils/cookies';
+import { db } from '@/db';
+import { users } from '@/db/schema';
 
 export async function POST(request: NextRequest) {
   try {

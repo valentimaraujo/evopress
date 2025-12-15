@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
 import { Loader2, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

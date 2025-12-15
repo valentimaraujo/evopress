@@ -1,5 +1,6 @@
-import { config } from 'dotenv';
 import { hash } from 'bcryptjs';
+import { config } from 'dotenv';
+
 import { db, pool } from './index';
 import { users } from './schema';
 
@@ -20,7 +21,7 @@ async function setup() {
     
     const indexes = [
       `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_users_meta_data ON ${tablePrefix}_users USING GIN (meta_data)`,
-      `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_content_blocks ON ${tablePrefix}_posts USING GIN (content_blocks)`,
+      `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_content_blocks ON ${tablePrefix}_posts USING GIN (content_blocks)`, // eslint-disable-line max-len
       `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_meta_data ON ${tablePrefix}_posts USING GIN (meta_data)`
     ];
 

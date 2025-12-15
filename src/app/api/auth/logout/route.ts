@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { removeSessionCookie } from '@/core/utils/cookies';
 
 export async function GET() {

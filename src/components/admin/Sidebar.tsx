@@ -1,8 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { clsx } from 'clsx';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -12,8 +10,12 @@ import {
   ChevronLeft,
   Menu
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import React, { useState } from 'react';
+
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
-import { clsx } from 'clsx';
+
 
 interface SidebarProps {
   systemName: string;

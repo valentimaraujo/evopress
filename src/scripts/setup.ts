@@ -1,11 +1,11 @@
-import { config } from 'dotenv';
-import { execSync } from 'child_process';
 import { hash } from 'bcryptjs';
+import { execSync } from 'child_process';
+import { config } from 'dotenv';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+
 import * as schema from '../db/schema';
 import { users } from '../db/schema';
-import { sql } from 'drizzle-orm';
 
 // 1. Carregar configuração
 config({ path: '.env.local' });
@@ -28,7 +28,7 @@ async function main() {
     try {
       execSync('npx drizzle-kit push', { stdio: 'inherit' });
       console.log('✅ Tabelas sincronizadas.');
-    } catch (e) {
+    } catch {
       console.error('❌ Falha ao sincronizar tabelas via drizzle-kit.');
       process.exit(1);
     }
@@ -43,16 +43,15 @@ async function main() {
       
       const indexes = [
         `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_users_meta_data ON ${tablePrefix}_users USING GIN (meta_data)`,
-        `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_content_blocks ON ${tablePrefix}_posts USING GIN (content_blocks)`,
+        `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_content_blocks ON ${tablePrefix}_posts USING GIN (content_blocks)`, // eslint-disable-line max-len
         `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_meta_data ON ${tablePrefix}_posts USING GIN (meta_data)`
       ];
 
       for (const query of indexes) {
         try {
           await pool.query(query);
-        } catch (idxError) {
+        } catch {
           // Ignorar erro se índice já existe ou não suportado (não deve bloquear setup)
-          // console.warn('Aviso índice:', idxError instanceof Error ? idxError.message : idxError);
         }
       }
       console.log('✅ Índices configurados.');
@@ -61,9 +60,10 @@ async function main() {
       console.log('👤 Verificando usuário administrador...');
       
       // Verifica se existe QUALQUER usuário (não apenas admin)
-      // Precisamos usar sql raw ou arriscar que o schema do drizzle use o nome da tabela errado se não estiver configurado
-      // Mas como importamos 'users' do schema que usa o prefixo dinamico, deve funcionar se o prefixo for o mesmo
-      // Para garantir, vamos confiar no Drizzle ORM já configurado com o schema correto
+      // Precisamos usar sql raw ou arriscar que o schema do drizzle use o nome da tabela errado
+      // se não estiver configurado. Mas como importamos 'users' do schema que usa o prefixo
+      // dinamico, deve funcionar se o prefixo for o mesmo. Para garantir, vamos confiar no
+      // Drizzle ORM já configurado com o schema correto
       
       const existingUsers = await db.select().from(users).limit(1);
       

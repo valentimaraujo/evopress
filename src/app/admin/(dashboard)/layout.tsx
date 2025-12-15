@@ -1,9 +1,10 @@
+import { eq } from 'drizzle-orm';
+
+import { Sidebar } from '@/components/admin/Sidebar';
+import { verifyToken } from '@/core/utils/auth';
+import { getSessionCookie } from '@/core/utils/cookies';
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import { getSessionCookie } from '@/core/utils/cookies';
-import { verifyToken } from '@/core/utils/auth';
-import { Sidebar } from '@/components/admin/Sidebar';
 
 async function getCurrentUser() {
   const token = await getSessionCookie();

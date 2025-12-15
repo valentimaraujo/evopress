@@ -1,10 +1,10 @@
-import { NextRequest } from 'next/server';
+import { isNull } from 'drizzle-orm';
+
+import { formatJSONResponse } from '@/core/utils/format-json-response';
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { isNull } from 'drizzle-orm';
-import { formatJSONResponse } from '@/core/utils/format-json-response';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const usersList = await db
       .select({
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       .orderBy(users.name);
 
     return formatJSONResponse(usersList);
-  } catch (error) {
+  } catch {
     return formatJSONResponse(
       { error: 'Erro ao buscar usuários' },
       { status: 500 }

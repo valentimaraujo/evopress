@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -14,6 +12,9 @@ import {
   ChevronRight,
   Filter,
 } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+
 import type { PostListItem, ListPostsResult } from '@/core/services/posts.service';
 
 const POST_STATUS_LABELS: Record<string, string> = {
@@ -275,7 +276,8 @@ export function PostsList() {
             placeholder="Buscar posts..."
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500"
+            className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 
+            dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500"
           />
         </div>
 
@@ -384,7 +386,9 @@ export function PostsList() {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[post.status] || STATUS_COLORS.draft}`}
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          STATUS_COLORS[post.status] || STATUS_COLORS.draft
+                        }`}
                       >
                         {POST_STATUS_LABELS[post.status] || post.status}
                       </span>
@@ -472,10 +476,10 @@ export function PostsList() {
                 <button
                   key={pageNum}
                   onClick={() => handlePageChange(pageNum)}
-                  className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium transition-colors ${
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-medium transition-colors ${ // eslint-disable-line max-len
                     isActive
                       ? 'border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 dark:border-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-600'
-                      : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
+                      : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'  
                   }`}
                 >
                   {pageNum}
@@ -486,7 +490,9 @@ export function PostsList() {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={!pagination.hasNext}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-700 transition-colors 
+              disabled:opacity-50 
+              disabled:cursor-not-allowed hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

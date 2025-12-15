@@ -1,5 +1,3 @@
-import { db } from '@/db';
-import { users } from '@/db/schema';
 import { count } from 'drizzle-orm';
 import { 
   Users, 
@@ -7,6 +5,9 @@ import {
   Image as ImageIcon,
   ArrowUpRight 
 } from 'lucide-react';
+
+import { db } from '@/db';
+import { users } from '@/db/schema';
 
 async function getStats() {
   const [userCount] = await db.select({ count: count() }).from(users);

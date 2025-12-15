@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+
 import { listPosts } from '@/core/services/posts.service';
 import { formatJSONResponse } from '@/core/utils/format-json-response';
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     });
 
     return formatJSONResponse(result);
-  } catch (error) {
+  } catch {
     return formatJSONResponse(
       { error: 'Erro ao buscar posts' },
       { status: 500 }

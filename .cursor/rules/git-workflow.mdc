@@ -17,14 +17,19 @@ O padrão exigido para mensagens de commit é:
 - **subject**: Descrição sucinta em **português**, lowercase, sem ponto final, máx 100 caracteres.
 
 ### Tipos Permitidos
-- `feat`: Nova funcionalidade
+- `build`: Mudanças que afetam o sistema de build ou dependências
+- `chore`: Tarefas rotineiras ou manutenção (atualização de dependências, configs)
+- `ci`: Mudanças em arquivos e scripts de configuração CI
+- `changeset`: Arquivos changeset automatizados ou gerados para versionamento
+- `docs`: Apenas atualizações de documentação
+- `feat`: Nova funcionalidade adicionada ao código
 - `fix`: Correção de bug
-- `docs`: Documentação
-- `style`: Formatação, pontos e vírgulas (sem alteração de código)
-- `refactor`: Refatoração de código (sem nova funcionalidade ou correção)
+- `refactor`: Mudanças de código que não corrigem bugs nem adicionam funcionalidades
+- `revert`: Reverte um commit anterior
+- `security`: Mudanças que abordam vulnerabilidades de segurança
+- `style`: Mudanças que não afetam a lógica do código (formatação, espaços)
 - `test`: Adição ou correção de testes
-- `chore`: Atualização de build, ferramentas, dependências
-- `revert`: Reverter mudanças anteriores
+- `translation`: Mudanças relacionadas a traduções ou internacionalização
 
 ### Exemplos
 ✅ `feat: criar componente de login`

@@ -1,6 +1,7 @@
-import { PostsList } from '@/admin/components/PostsList';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+
+import { PostsList } from '@/admin/components/PostsList';
 
 export default function PostsPage() {
   return (
