@@ -8,7 +8,9 @@ import {
   Users, 
   LogOut, 
   ChevronLeft,
-  Menu
+  Menu as MenuIcon,
+  Settings,
+  Navigation
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -34,8 +36,10 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
   const menuItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/posts', label: 'Posts', icon: FileText },
+    { href: '/admin/menus', label: 'Menus', icon: Navigation },
     { href: '/admin/media', label: 'Mídia', icon: ImageIcon },
     { href: '/admin/users', label: 'Usuários', icon: Users },
+    { href: '/admin/settings/reading', label: 'Configurações', icon: Settings },
   ];
 
   return (
@@ -46,7 +50,7 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
           onClick={handleToggle}
           className="rounded-lg bg-white p-2 shadow-md dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
         >
-          <Menu className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
+          <MenuIcon className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
         </button>
       </div>
 

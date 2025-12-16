@@ -28,7 +28,6 @@ const POST_STATUS_LABELS: Record<string, string> = {
 const POST_TYPE_LABELS: Record<string, string> = {
   post: 'Post',
   page: 'Página',
-  custom: 'Custom',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -342,7 +341,6 @@ export function PostsList() {
             <option value="">Todos os tipos</option>
             <option value="post">Post</option>
             <option value="page">Página</option>
-            <option value="custom">Custom</option>
           </select>
 
           <select

@@ -12,7 +12,7 @@ export default function PostsPage() {
             Posts
           </h1>
           <p className="mt-2 text-zinc-500 dark:text-zinc-400">
-            Gerencie todos os seus posts, páginas e conteúdo customizado.
+            Gerencie todos os seus posts e páginas.
           </p>
         </div>
         <Link
