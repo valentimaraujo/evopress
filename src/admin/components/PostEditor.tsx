@@ -1,16 +1,9 @@
 'use client';
 
-import { Color } from '@tiptap/extension-color';
-import { Highlight } from '@tiptap/extension-highlight';
-import { Link } from '@tiptap/extension-link';
-import { TextAlign } from '@tiptap/extension-text-align';
-import { TextStyle } from '@tiptap/extension-text-style';
-import { Underline } from '@tiptap/extension-underline';
 import { useEditor as useTiptapEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
 import { Save, Code, Layout } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -18,10 +11,13 @@ import { Label } from '@/components/ui/Label';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import type { Post, PostStatus, PostType } from '@/core/services/posts.service';
+import { showError } from '@/core/utils/swal';
 
 import { BlockEditor } from './builder/BlockEditor';
 import { Toolbar } from './builder/Toolbar';
 import type { ContentBlock } from './builder/types';
+import { blocksToHtml } from './builder/utils/content-converter';
+import { getTiptapExtensions } from './builder/utils/tiptap-extensions';
 
 interface PostEditorProps {
   post?: Post | null;
@@ -44,57 +40,10 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
     (post?.contentBlocks as ContentBlock[]) || []
   );
 
-  const getSimpleContent = useCallback((currentBlocks: ContentBlock[]) => {
-    if (post && currentBlocks.length === 0) {
-      const content = post.contentBlocks?.[0];
-      if (content && typeof content === 'object' && 'content' in content) {
-        return (content as { content: string }).content;
-      }
-    }
-    const paragraphBlock = currentBlocks.find((b) => b.type === 'paragraph') as
-      | { content: string }
-      | undefined;
-    if (paragraphBlock) {
-      return paragraphBlock.content;
-    }
-    if (currentBlocks.length > 0) {
-      return currentBlocks
-        .map((block) => {
-          if (block.type === 'heading') {
-            const { level } = block as { level: number };
-            const { content } = block as { content: string };
-            return `<h${level}>${content}</h${level}>`;
-          }
-          if (block.type === 'paragraph') {
-            return (block as { content: string }).content;
-          }
-          return '';
-        })
-        .filter(Boolean)
-        .join('');
-    }
-    return '';
-  }, [post]);
-
   const simpleEditor = useTiptapEditor({
-    extensions: [
-      StarterKit,
-      TextStyle,
-      Color,
-      Highlight.configure({ multicolor: true }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-indigo-600 underline hover:text-indigo-700',
-        },
-      }),
-    ],
+    extensions: getTiptapExtensions(),
     immediatelyRender: false,
-    content: getSimpleContent(blocks),
+    content: blocksToHtml(blocks),
     onUpdate: ({ editor }) => {
       if (mode === 'simple') {
         const htmlContent = editor.getHTML();
@@ -118,15 +67,12 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
   useEffect(() => {
     if (simpleEditor && mode === 'simple') {
       const currentContent = simpleEditor.getHTML();
-      const newContent = getSimpleContent(blocks);
-      // Only update if content is significantly different to avoid cursor jumps
-      if (Math.abs(currentContent.length - newContent.length) > 10 || (currentContent === '<p></p>' && newContent)) {
-         if (currentContent !== newContent) {
-            simpleEditor.commands.setContent(newContent);
-         }
+      const newContent = blocksToHtml(blocks);
+      if (currentContent !== newContent && newContent) {
+        simpleEditor.commands.setContent(newContent);
       }
     }
-  }, [blocks, mode, simpleEditor, getSimpleContent]);
+  }, [blocks, mode, simpleEditor]);
 
   const handleUploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -148,12 +94,15 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
   const handleSave = async () => {
     setSaving(true);
     try {
+      const finalTitle = title || '';
+      const finalSlug = slug || (finalTitle ? generateSlug(finalTitle) : 'post-' + Date.now());
+
       const payload = {
-        title,
-        slug,
+        title: finalTitle,
+        slug: finalSlug,
         excerpt: excerpt || null,
-        status,
-        postType,
+        status: status || 'draft',
+        postType: postType || 'post',
         contentBlocks: blocks,
         metaData: {
           editorMode: mode,
@@ -181,9 +130,8 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
       const savedPost = await response.json();
       router.push(`/admin/posts/${savedPost.uuid}`);
       router.refresh();
-    } catch (error) {
-      console.error('Erro ao salvar:', error);
-      alert('Erro ao salvar o post');
+    } catch {
+      await showError('Erro ao salvar o post');
     } finally {
       setSaving(false);
     }
@@ -224,8 +172,8 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
         }
       }
     } else if (newMode === 'simple' && mode === 'visual') {
-      const htmlContent = getSimpleContent(blocks);
-      if (simpleEditor) {
+      const htmlContent = blocksToHtml(blocks);
+      if (simpleEditor && htmlContent) {
         simpleEditor.commands.setContent(htmlContent);
       }
     }
@@ -234,7 +182,6 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
 
   return (
     <div className="flex h-full flex-col bg-zinc-50 dark:bg-zinc-950">
-      {/* Header */}
       <div className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
@@ -275,14 +222,12 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-hidden">
-        <div className="flex h-full gap-6 p-6">
-          {/* Main Column */}
+        <div className="flex h-full gap-6 p-6 overflow-hidden">
           <div className="flex flex-1 flex-col gap-6 overflow-hidden">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title" required>
+                <Label htmlFor="title">
                   Título
                 </Label>
                 <Input
@@ -307,34 +252,32 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
             </div>
 
             <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-                <div className="flex flex-col h-full min-h-[500px]">
-                    {mode === 'visual' ? (
-                        <div className="flex-1 overflow-hidden">
-                            <BlockEditor
-                            blocks={blocks}
-                            onChange={setBlocks}
-                            onUploadImage={handleUploadImage}
-                            />
+              <div className="flex flex-col h-full">
+                {mode === 'visual' ? (
+                  <div className="flex-1 overflow-hidden">
+                    <BlockEditor blocks={blocks} onChange={setBlocks} onUploadImage={handleUploadImage} />
+                  </div>
+                ) : (
+                  <div className="flex flex-col h-full">
+                    {simpleEditor && (
+                      <>
+                        <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
+                          <Toolbar editor={simpleEditor} />
                         </div>
-                    ) : (
-                        <div className="flex flex-col h-full">
-                            {simpleEditor && (
-                                <>
-                                <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
-                                    <Toolbar editor={simpleEditor} />
-                                </div>
-                                <div className="flex-1 cursor-text overflow-y-auto bg-white dark:bg-zinc-900" onClick={() => simpleEditor.commands.focus()}>
-                                    <EditorContent editor={simpleEditor} className="h-full min-h-full" />
-                                </div>
-                                </>
-                            )}
+                        <div
+                          className="flex-1 cursor-text overflow-y-auto bg-white dark:bg-zinc-900"
+                          onClick={() => simpleEditor.commands.focus()}
+                        >
+                          <EditorContent editor={simpleEditor} className="h-full min-h-full" />
                         </div>
+                      </>
                     )}
-                </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Sidebar Column */}
           <div className="w-80 shrink-0 space-y-6 overflow-y-auto">
             <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
               <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-white">

@@ -92,6 +92,9 @@ importers:
       react-dom:
         specifier: 19.2.1
         version: 19.2.1(react@19.2.1)
+      sweetalert2:
+        specifier: ^11.10.5
+        version: 11.26.10
     devDependencies:
       '@commitlint/cli':
         specifier: ^20.2.0
@@ -3451,6 +3454,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  sweetalert2@11.26.10:
+    resolution: {integrity: sha512-l/aaL9WWbumBOaMvcs4aCKzyQwkQCplSmSGpJD7FuRcSDWZyr2OEDmtcSPj2/w3N2TC2xw48Vg5cL6IkUJnPlQ==}
 
   synckit@0.11.11:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
@@ -6922,6 +6928,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  sweetalert2@11.26.10: {}
 
   synckit@0.11.11:
     dependencies:

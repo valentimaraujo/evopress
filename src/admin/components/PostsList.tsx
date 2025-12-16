@@ -7,10 +7,11 @@ import {
   FileText,
   Calendar,
   User,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
   Filter,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
@@ -66,8 +67,8 @@ export function PostsList() {
           const data = await response.json();
           setUsers(data);
         }
-      } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
+      } catch {
+        // Silenciosamente falha ao buscar usuários
       }
     };
 
@@ -112,8 +113,8 @@ export function PostsList() {
       const data: ListPostsResult = await response.json();
       setPosts(data.posts);
       setPagination(data.pagination);
-    } catch (error) {
-      console.error('Erro ao buscar posts:', error);
+    } catch {
+      // Silenciosamente falha ao buscar posts
     } finally {
       setLoading(false);
     }
@@ -427,10 +428,22 @@ export function PostsList() {
                         })}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300">
-                        <MoreVertical className="h-5 w-5" />
-                      </button>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => router.push(`/admin/posts/${post.uuid}`)}
+                          className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
+                          title="Editar post"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                          title="Excluir post"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -89,8 +89,7 @@ export async function PUT(
     }
 
     return formatJSONResponse(updatedPost);
-  } catch (error) {
-    console.error('Erro ao atualizar post:', error);
+  } catch {
     return formatJSONResponse(
       { error: 'Erro ao atualizar post' },
       { status: 500 }

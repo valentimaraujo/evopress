@@ -59,13 +59,6 @@ export async function POST(request: NextRequest) {
       seoKeywords,
     } = body;
 
-    if (!title || !slug) {
-      return formatJSONResponse(
-        { error: 'Título e slug são obrigatórios' },
-        { status: 400 }
-      );
-    }
-
     const newPost = await createPost({
       title,
       slug,
@@ -81,8 +74,7 @@ export async function POST(request: NextRequest) {
     });
 
     return formatJSONResponse(newPost, { status: 201 });
-  } catch (error) {
-    console.error('Erro ao criar post:', error);
+  } catch {
     return formatJSONResponse(
       { error: 'Erro ao criar post' },
       { status: 500 }

@@ -1,9 +1,6 @@
 'use client';
 
-import React from 'react';
-
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
+import React, { useState, useRef, useEffect } from 'react';
 
 import type { HeadingBlock } from '../types';
 
@@ -14,40 +11,78 @@ interface HeadingBlockProps {
 }
 
 export function HeadingBlock({ block, isEditing, onChange }: HeadingBlockProps) {
-  const HeadingTag = `h${block.level}` as keyof JSX.IntrinsicElements;
+  const [isInlineEditing, setIsInlineEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const sizeClasses = {
+    1: 'text-4xl',
+    2: 'text-3xl',
+    3: 'text-2xl',
+    4: 'text-xl',
+    5: 'text-lg',
+    6: 'text-base',
+  };
 
-  if (isEditing) {
+  useEffect(() => {
+    if (isInlineEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isInlineEditing]);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isEditing) {
+      return;
+    }
+    e.stopPropagation();
+    setIsInlineEditing(true);
+  };
+
+  const handleBlur = () => {
+    setIsInlineEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur();
+    }
+    if (e.key === 'Escape') {
+      setIsInlineEditing(false);
+    }
+  };
+
+  if (isEditing && isInlineEditing) {
     return (
-      <div className="space-y-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
-        <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Nível do Título
-          </label>
-          <Select
-            value={block.level}
-            onChange={(e) => onChange({ ...block, level: parseInt(e.target.value, 10) as HeadingBlock['level'] })}
-          >
-            <option value={1}>H1</option>
-            <option value={2}>H2</option>
-            <option value={3}>H3</option>
-            <option value={4}>H4</option>
-            <option value={5}>H5</option>
-            <option value={6}>H6</option>
-          </Select>
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Conteúdo
-          </label>
-          <Input
-            value={block.content}
-            onChange={(e) => onChange({ ...block, content: e.target.value })}
-            placeholder="Digite o título..."
-          />
-        </div>
-      </div>
+      <input
+        ref={inputRef}
+        type="text"
+        value={block.content}
+        onChange={(e) => onChange({ ...block, content: e.target.value })}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        className={`${sizeClasses[block.level]} font-bold border-2 border-indigo-500 rounded px-2 py-1 w-full 
+        bg-white dark:bg-zinc-900`}
+        onClick={(e) => e.stopPropagation()}
+      />
     );
   }
 
-  return <HeadingTag className={`text-${6 - block.level}xl font-bold p-4`}>{block.content}</HeadingTag>;
+  const className = `${sizeClasses[block.level]} font-bold ${isEditing ? 'cursor-text hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded px-1' : ''}`;
+  const props = { className, onClick: handleClick };
+
+  switch (block.level) {
+    case 1:
+      return <h1 {...props}>{block.content}</h1>;
+    case 2:
+      return <h2 {...props}>{block.content}</h2>;
+    case 3:
+      return <h3 {...props}>{block.content}</h3>;
+    case 4:
+      return <h4 {...props}>{block.content}</h4>;
+    case 5:
+      return <h5 {...props}>{block.content}</h5>;
+    case 6:
+      return <h6 {...props}>{block.content}</h6>;
+    default:
+      return <h2 {...props}>{block.content}</h2>;
+  }
 }
