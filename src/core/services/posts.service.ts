@@ -344,3 +344,81 @@ export async function deletePost(uuid: string, authorUuid: string): Promise<{ su
   return { success: true };
 }
 
+export async function getPostBySlug(slug: string, postType: PostType): Promise<Post | null> {
+  const [post] = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.slug, slug),
+        eq(posts.postType, postType),
+        eq(posts.status, 'published'),
+        isNull(posts.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!post) {
+    return null;
+  }
+
+  return {
+    uuid: post.uuid,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    status: post.status as PostStatus,
+    postType: post.postType as PostType,
+    authorUuid: post.authorUuid,
+    contentBlocks: (post.contentBlocks as unknown[]) || [],
+    metaData: (post.metaData as Record<string, unknown>) || null,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    seoKeywords: post.seoKeywords,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    publishedAt: post.publishedAt,
+  };
+}
+
+export async function getPostBySlugForPreview(
+  slug: string,
+  postType: PostType,
+  authorUuid: string
+): Promise<Post | null> {
+  const [post] = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.slug, slug),
+        eq(posts.postType, postType),
+        eq(posts.authorUuid, authorUuid),
+        isNull(posts.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!post) {
+    return null;
+  }
+
+  return {
+    uuid: post.uuid,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    status: post.status as PostStatus,
+    postType: post.postType as PostType,
+    authorUuid: post.authorUuid,
+    contentBlocks: (post.contentBlocks as unknown[]) || [],
+    metaData: (post.metaData as Record<string, unknown>) || null,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    seoKeywords: post.seoKeywords,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    publishedAt: post.publishedAt,
+  };
+}
+
