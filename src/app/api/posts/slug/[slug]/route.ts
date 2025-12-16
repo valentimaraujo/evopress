@@ -9,11 +9,7 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    let post = await getPostBySlug(slug, 'post');
-    
-    if (!post) {
-      post = await getPostBySlug(slug, 'custom');
-    }
+    const post = await getPostBySlug(slug, 'post');
 
     if (!post) {
       return formatJSONResponse({ error: 'Post não encontrado' }, { status: 404 });

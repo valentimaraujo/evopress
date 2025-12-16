@@ -27,7 +27,7 @@ export const posts = pgTable('posts', {
   slug: text('slug').notNull().unique(),
   excerpt: text('excerpt'),
   status: text('status', { enum: ['draft', 'published', 'archived'] }).notNull().default('draft'),
-  postType: text('post_type', { enum: ['post', 'page', 'custom'] }).notNull().default('post'),
+  postType: text('post_type', { enum: ['post', 'page'] }).notNull().default('post'),
   contentBlocks: jsonb('content_blocks').default([]),
   metaData: jsonb('meta_data').default({}),
   seoTitle: text('seo_title'),

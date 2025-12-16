@@ -308,7 +308,6 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
                   >
                     <option value="post">Post</option>
                     <option value="page">Página</option>
-                    <option value="custom">Custom</option>
                   </Select>
                 </div>
 
