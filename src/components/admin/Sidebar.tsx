@@ -15,6 +15,7 @@ import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { getAppVersionFormatted } from '@/core/utils/app-version';
 
 
 interface SidebarProps {
@@ -107,6 +108,16 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
           <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 space-y-4 shrink-0">
             
             <ThemeToggle collapsed={collapsed} />
+
+            {/* Versão da Aplicação */}
+            <div className={clsx(
+              "text-center transition-all duration-300",
+              collapsed ? "opacity-0 max-h-0 overflow-hidden" : "opacity-100 max-h-6"
+            )}>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                {getAppVersionFormatted()}
+              </p>
+            </div>
 
             {user && (
               <div className={clsx(
