@@ -39,6 +39,9 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
   const [blocks, setBlocks] = useState<ContentBlock[]>(
     (post?.contentBlocks as ContentBlock[]) || []
   );
+  const [isHomepage, setIsHomepage] = useState(
+    (post?.metaData as Record<string, unknown>)?.isHomepage === true
+  );
 
   const simpleEditor = useTiptapEditor({
     extensions: getTiptapExtensions(),
@@ -74,6 +77,13 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
     }
   }, [blocks, mode, simpleEditor]);
 
+  useEffect(() => {
+    if (post) {
+      const metaData = post.metaData as Record<string, unknown> | null;
+      setIsHomepage(metaData?.isHomepage === true);
+    }
+  }, [post]);
+
   const handleUploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -106,6 +116,7 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
         contentBlocks: blocks,
         metaData: {
           editorMode: mode,
+          isHomepage: postType === 'page' && isHomepage ? true : undefined,
         },
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
@@ -128,6 +139,19 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
       }
 
       const savedPost = await response.json();
+
+      if (postType === 'page' && isHomepage && savedPost.uuid) {
+        try {
+          await fetch('/api/settings/homepage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pageUuid: savedPost.uuid }),
+          });
+        } catch {
+          // Silenciosamente falha se não conseguir definir homepage
+        }
+      }
+
       router.push(`/admin/posts/${savedPost.uuid}`);
       router.refresh();
     } catch {
@@ -322,6 +346,22 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
                     autoResize
                   />
                 </div>
+
+                {postType === 'page' && (
+                  <div>
+                    <label className="flex cursor-pointer items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isHomepage}
+                        onChange={(e) => setIsHomepage(e.target.checked)}
+                        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                        Definir como página inicial
+                      </span>
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
 
