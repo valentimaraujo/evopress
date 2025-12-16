@@ -241,7 +241,7 @@ export async function deleteMenu(uuid: string): Promise<boolean> {
 
 export async function createMenuItem(params: CreateMenuItemParams): Promise<MenuItem> {
   const now = new Date();
-  const [item] = await db
+  const result = await db
     .insert(menuItems)
     .values({
       menuUuid: params.menuUuid,
@@ -253,6 +253,12 @@ export async function createMenuItem(params: CreateMenuItemParams): Promise<Menu
       updatedAt: now,
     })
     .returning();
+  
+  const item = result[0];
+  
+  if (!item) {
+    throw new Error('Erro ao criar item do menu no banco de dados');
+  }
 
   const [page] = await db
     .select()
@@ -274,7 +280,7 @@ export async function createMenuItem(params: CreateMenuItemParams): Promise<Menu
 
 export async function createMenuItems(menuUuid: string, items: CreateMenuItemParams[]): Promise<MenuItem[]> {
   const now = new Date();
-  const createdItems = await db
+  const result = await db
     .insert(menuItems)
     .values(
       items.map((item) => ({
@@ -289,6 +295,12 @@ export async function createMenuItems(menuUuid: string, items: CreateMenuItemPar
     )
     .returning();
 
+  const createdItems = Array.isArray(result) ? result : [];
+  
+  if (createdItems.length === 0) {
+    throw new Error('Erro ao criar itens do menu no banco de dados');
+  }
+
   const pageUuids = createdItems.map((item) => item.pageUuid);
   const pages = await db
     .select()
@@ -297,7 +309,7 @@ export async function createMenuItems(menuUuid: string, items: CreateMenuItemPar
 
   const pageMap = new Map(pages.map((p) => [p.uuid, p as Post]));
 
-  return createdItems.map((item) => ({
+  return createdItems.map((item): MenuItem => ({
     uuid: item.uuid,
     menuUuid: item.menuUuid,
     pageUuid: item.pageUuid,
@@ -305,7 +317,7 @@ export async function createMenuItems(menuUuid: string, items: CreateMenuItemPar
     order: item.order,
     parentUuid: item.parentUuid,
     url: item.url,
-    page: pageMap.get(item.pageUuid),
+    page: pageMap.get(item.pageUuid) as Post | undefined,
   }));
 }
 

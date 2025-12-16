@@ -238,7 +238,6 @@ export function MenuItemsList({
           <MenuItemEditor
             item={editingItem}
             allItems={flatItems}
-            totalItems={flatItems.length}
             onUpdate={async (uuid, updates) => {
               await onUpdate(uuid, updates);
               setEditingItem(null);
