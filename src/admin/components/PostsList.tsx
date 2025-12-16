@@ -17,6 +17,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 
 import type { PostListItem, ListPostsResult } from '@/core/services/posts.service';
+import { showError, showSuccess, showConfirmDelete } from '@/core/utils/swal';
 
 const POST_STATUS_LABELS: Record<string, string> = {
   draft: 'Rascunho',
@@ -50,6 +51,7 @@ export function PostsList() {
   const [posts, setPosts] = useState<PostListItem[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [typeFilter, setTypeFilter] = useState(searchParams.get('postType') || '');
@@ -214,6 +216,43 @@ export function PostsList() {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     updateURL({ page: newPage });
+  };
+
+  const handleDeletePost = async (post: PostListItem) => {
+    const result = await showConfirmDelete(post.title);
+    
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    setDeletingPostId(post.uuid);
+    try {
+      const response = await fetch(`/api/posts/${post.uuid}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        const errorMessage = data.error || 'Erro ao excluir post';
+        
+        if (response.status === 404) {
+          await showError('Post não encontrado');
+        } else if (response.status === 403) {
+          await showError('Você não tem permissão para excluir este post');
+        } else {
+          await showError(errorMessage);
+        }
+        return;
+      }
+
+      await showSuccess('Post excluído com sucesso');
+      
+      await fetchPosts(currentPage, search, statusFilter, typeFilter, authorFilter);
+    } catch {
+      await showError('Erro ao excluir post');
+    } finally {
+      setDeletingPostId(null);
+    }
   };
 
   const getPageNumbers = () => {
@@ -438,7 +477,9 @@ export function PostsList() {
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
-                          className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                          onClick={() => handleDeletePost(post)}
+                          disabled={deletingPostId === post.uuid}
+                          className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Excluir post"
                         >
                           <Trash2 className="h-4 w-4" />

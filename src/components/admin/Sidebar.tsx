@@ -109,16 +109,6 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
             
             <ThemeToggle collapsed={collapsed} />
 
-            {/* Versão da Aplicação */}
-            <div className={clsx(
-              "text-center transition-all duration-300",
-              collapsed ? "opacity-0 max-h-0 overflow-hidden" : "opacity-100 max-h-6"
-            )}>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                {getAppVersionFormatted()}
-              </p>
-            </div>
-
             {user && (
               <div className={clsx(
                 "flex items-center gap-3 rounded-xl bg-zinc-50 p-2 dark:bg-zinc-800/50 transition-all duration-300",
@@ -151,6 +141,16 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
                 )}
               </div>
             )}
+
+            {/* Made with love */}
+            <div className={clsx(
+              "text-center transition-all duration-300 space-y-1",
+              collapsed ? "opacity-0 max-h-0 overflow-hidden" : "opacity-100"
+            )}>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                {getAppVersionFormatted()}
+              </p>
+            </div>
           </div>
         </aside>
 

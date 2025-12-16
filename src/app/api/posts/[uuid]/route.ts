@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { getPost, updatePost } from '@/core/services/posts.service';
+import { getPost, updatePost, deletePost } from '@/core/services/posts.service';
 import { verifyToken } from '@/core/utils/auth';
 import { getSessionCookie } from '@/core/utils/cookies';
 import { formatJSONResponse } from '@/core/utils/format-json-response';
@@ -92,6 +92,43 @@ export async function PUT(
   } catch {
     return formatJSONResponse(
       { error: 'Erro ao atualizar post' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ uuid: string }> }
+) {
+  try {
+    const token = await getSessionCookie();
+    if (!token) {
+      return formatJSONResponse({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const payload = await verifyToken(token);
+    if (!payload || !payload.sub) {
+      return formatJSONResponse({ error: 'Token inválido' }, { status: 401 });
+    }
+
+    const { uuid } = await params;
+    const result = await deletePost(uuid, payload.sub);
+
+    if (!result.success) {
+      if (result.error === 'Post não encontrado') {
+        return formatJSONResponse({ error: result.error }, { status: 404 });
+      }
+      if (result.error === 'Você não tem permissão para excluir este post') {
+        return formatJSONResponse({ error: result.error }, { status: 403 });
+      }
+      return formatJSONResponse({ error: result.error || 'Erro ao excluir post' }, { status: 500 });
+    }
+
+    return formatJSONResponse({ message: 'Post excluído com sucesso' });
+  } catch {
+    return formatJSONResponse(
+      { error: 'Erro ao excluir post' },
       { status: 500 }
     );
   }

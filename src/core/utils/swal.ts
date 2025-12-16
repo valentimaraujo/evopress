@@ -36,3 +36,18 @@ export async function showInfo(message: string, title = 'Informação') {
   });
 }
 
+export async function showConfirmDelete(postTitle: string) {
+  return Swal.fire({
+    icon: 'warning',
+    title: 'Confirmar exclusão',
+    html: `Tem certeza que deseja excluir o post <strong>"${postTitle}"</strong>?<br><br>Esta ` +
+     `ação não pode ser desfeita.`,
+    showCancelButton: true,
+    confirmButtonText: 'Excluir',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#ef4444',
+    cancelButtonColor: '#6b7280',
+    reverseButtons: true,
+  });
+}
+

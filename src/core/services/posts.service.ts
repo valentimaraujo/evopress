@@ -320,3 +320,27 @@ export async function listPosts(params: ListPostsParams = {}): Promise<ListPosts
   };
 }
 
+export async function deletePost(uuid: string, authorUuid: string): Promise<{ success: boolean; error?: string }> {
+  const existingPost = await getPost(uuid);
+  
+  if (!existingPost) {
+    return { success: false, error: 'Post não encontrado' };
+  }
+
+  if (existingPost.authorUuid !== authorUuid) {
+    return { success: false, error: 'Você não tem permissão para excluir este post' };
+  }
+
+  const now = new Date();
+
+  await db
+    .update(posts)
+    .set({
+      deletedAt: now,
+      updatedAt: now,
+    })
+    .where(eq(posts.uuid, uuid));
+
+  return { success: true };
+}
+
