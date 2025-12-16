@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json() as CreateMenuParams;
 
-    if (!body.name || !body.slug) {
+    if (!body.name) {
       return formatJSONResponse(
-        { error: 'Nome e slug são obrigatórios' },
+        { error: 'Nome é obrigatório' },
         { status: 400 }
       );
     }
@@ -51,15 +51,18 @@ export async function POST(request: NextRequest) {
     const menu = await createMenu(body);
     return formatJSONResponse(menu, { status: 201 });
   } catch (error: any) {
-    if (error.message?.includes('unique')) {
-      return formatJSONResponse(
-        { error: 'Já existe um menu com este slug' },
-        { status: 409 }
-      );
+    console.error('Erro ao criar menu:', error);
+    
+    let errorMessage = 'Erro ao criar menu';
+    let statusCode = 500;
+    
+    if (error.message && !error.message.includes('Failed query') && !error.message.includes('SQL')) {
+      errorMessage = error.message;
     }
+    
     return formatJSONResponse(
-      { error: 'Erro ao criar menu' },
-      { status: 500 }
+      { error: errorMessage },
+      { status: statusCode }
     );
   }
 }

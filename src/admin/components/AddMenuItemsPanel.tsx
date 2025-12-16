@@ -51,7 +51,15 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
   }, []);
 
   useEffect(() => {
+    setCurrentPage(1);
+    setPages([]);
+    fetchPages('recent', 1);
+  }, []);
+
+  useEffect(() => {
     if (activeTab === 'recent' || activeTab === 'all') {
+      setCurrentPage(1);
+      setPages([]);
       fetchPages(activeTab, 1);
     }
   }, [activeTab, fetchPages]);

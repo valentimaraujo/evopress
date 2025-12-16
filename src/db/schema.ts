@@ -67,14 +67,11 @@ export const media = pgTable('media', {
 export const menus = pgTable('menus', {
   uuid: uuid('uuid').defaultRandom().primaryKey(),
   name: text('name').notNull(),
-  slug: text('slug').notNull().unique(),
-  description: text('description'),
   location: text('location'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (table) => [
-  index(`idx_${tablePrefix}_menus_slug`).on(table.slug),
   index(`idx_${tablePrefix}_menus_location`).on(table.location),
   index(`idx_${tablePrefix}_menus_deleted_at`).on(table.deletedAt),
 ]);

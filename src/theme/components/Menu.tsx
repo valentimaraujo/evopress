@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import type { MenuItem } from '@/core/services/menus.service';
 
 interface MenuProps {
-  menuSlug?: string;
   location?: string;
 }
 
@@ -54,22 +53,20 @@ function MenuItemComponent({ item, depth = 0 }: { item: MenuItem; depth?: number
   );
 }
 
-export function Menu({ menuSlug, location }: MenuProps) {
+export function Menu({ location }: MenuProps) {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!location) {
+      setLoading(false);
+      return;
+    }
+
     const fetchMenu = async () => {
       try {
         const params = new URLSearchParams();
-        if (menuSlug) {
-          params.set('slug', menuSlug);
-        } else if (location) {
-          params.set('location', location);
-        } else {
-          setLoading(false);
-          return;
-        }
+        params.set('location', location);
 
         const response = await fetch(`/api/menus/public?${params.toString()}`);
         if (!response.ok) {
@@ -87,7 +84,7 @@ export function Menu({ menuSlug, location }: MenuProps) {
     };
 
     fetchMenu();
-  }, [menuSlug, location]);
+  }, [location]);
 
   if (loading) {
     return null;

@@ -97,9 +97,7 @@ export function MenusList() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-zinc-900 dark:text-white">{menu.name}</h3>
                   <div className="mt-1 flex gap-4 text-sm text-zinc-500 dark:text-zinc-400">
-                    <span>Slug: {menu.slug}</span>
                     {menu.location && <span>Local: {menu.location}</span>}
-                    {menu.description && <span>{menu.description}</span>}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

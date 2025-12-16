@@ -52,12 +52,7 @@ export async function PUT(
 
     return formatJSONResponse(menu);
   } catch (error: any) {
-    if (error.message?.includes('unique')) {
-      return formatJSONResponse(
-        { error: 'Já existe um menu com este slug' },
-        { status: 409 }
-      );
-    }
+    console.error('Erro ao atualizar menu:', error);
     return formatJSONResponse(
       { error: 'Erro ao atualizar menu' },
       { status: 500 }
@@ -84,7 +79,8 @@ export async function DELETE(
     await deleteMenu(uuid);
 
     return formatJSONResponse({ message: 'Menu excluído com sucesso' });
-  } catch {
+  } catch (error) {
+    console.error('Erro ao excluir menu:', error);
     return formatJSONResponse(
       { error: 'Erro ao excluir menu' },
       { status: 500 }

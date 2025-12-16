@@ -8,8 +8,6 @@ import type { Post } from './posts.service';
 export interface Menu {
   uuid: string;
   name: string;
-  slug: string;
-  description: string | null;
   location: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -41,15 +39,11 @@ export interface MenuItemFlat {
 
 export interface CreateMenuParams {
   name: string;
-  slug: string;
-  description?: string;
   location?: string;
 }
 
 export interface UpdateMenuParams {
   name?: string;
-  slug?: string;
-  description?: string;
   location?: string;
 }
 
@@ -73,15 +67,6 @@ export interface MoveMenuItemParams {
   targetUuid?: string;
 }
 
-export async function getMenuBySlug(slug: string): Promise<Menu | null> {
-  const [menu] = await db
-    .select()
-    .from(menus)
-    .where(and(eq(menus.slug, slug), isNull(menus.deletedAt)))
-    .limit(1);
-
-  return menu || null;
-}
 
 export async function getMenuByUuid(uuid: string): Promise<Menu | null> {
   const [menu] = await db
@@ -197,20 +182,23 @@ function buildMenuTree(items: MenuItem[]): MenuItem[] {
 }
 
 export async function createMenu(params: CreateMenuParams): Promise<Menu> {
-  const now = new Date();
-  const [menu] = await db
-    .insert(menus)
-    .values({
-      name: params.name,
-      slug: params.slug,
-      description: params.description || null,
-      location: params.location || null,
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning();
+  try {
+    const [menu] = await db
+      .insert(menus)
+      .values({
+        name: params.name,
+        location: params.location || null,
+      })
+      .returning();
 
-  return menu;
+    if (!menu) {
+      throw new Error('Erro ao criar menu no banco de dados');
+    }
+
+    return menu;
+  } catch (error: any) {
+    throw error;
+  }
 }
 
 export async function updateMenu(uuid: string, params: UpdateMenuParams): Promise<Menu | null> {
@@ -219,8 +207,6 @@ export async function updateMenu(uuid: string, params: UpdateMenuParams): Promis
   };
 
   if (params.name !== undefined) updateData.name = params.name;
-  if (params.slug !== undefined) updateData.slug = params.slug;
-  if (params.description !== undefined) updateData.description = params.description || null;
   if (params.location !== undefined) updateData.location = params.location || null;
 
   const [menu] = await db

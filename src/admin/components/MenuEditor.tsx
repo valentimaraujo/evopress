@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Textarea } from '@/components/ui/Textarea';
 import type { Menu, MenuItem, MenuItemFlat } from '@/core/services/menus.service';
 import { showError, showSuccess } from '@/core/utils/swal';
 
@@ -18,33 +17,38 @@ interface MenuEditorProps {
 }
 
 export function MenuEditor({ menu, onSave }: MenuEditorProps) {
+  const [currentMenu, setCurrentMenu] = useState<Menu | null>(menu);
   const [menuName, setMenuName] = useState(menu?.name || '');
-  const [menuSlug, setMenuSlug] = useState(menu?.slug || '');
-  const [menuDescription, setMenuDescription] = useState(menu?.description || '');
   const [menuLocation, setMenuLocation] = useState(menu?.location || 'header');
   const [items, setItems] = useState<MenuItem[]>([]);
   const [flatItems, setFlatItems] = useState<MenuItemFlat[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [menuCreated, setMenuCreated] = useState(menu !== null);
 
   useEffect(() => {
     if (menu) {
+      setCurrentMenu(menu);
       setMenuName(menu.name);
-      setMenuSlug(menu.slug);
-      setMenuDescription(menu.description || '');
       setMenuLocation(menu.location || 'header');
+      setMenuCreated(true);
       fetchMenuItems();
+    } else {
+      setCurrentMenu(null);
+      setMenuCreated(false);
+      setItems([]);
+      setFlatItems([]);
     }
   }, [menu]);
 
   const fetchMenuItems = async () => {
-    if (!menu) return;
+    if (!currentMenu) return;
 
     setLoading(true);
     try {
       const [hierarchicalResponse, flatResponse] = await Promise.all([
-        fetch(`/api/menus/${menu.uuid}/items`),
-        fetch(`/api/menus/${menu.uuid}/items?flat=true`),
+        fetch(`/api/menus/${currentMenu.uuid}/items`),
+        fetch(`/api/menus/${currentMenu.uuid}/items?flat=true`),
       ]);
 
       if (!hierarchicalResponse.ok || !flatResponse.ok) {
@@ -65,17 +69,17 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
   };
 
   const handleAddItems = async (pageUuids: string[]) => {
-    if (!menu) return;
+    if (!currentMenu) return;
 
     try {
       const newItems = pageUuids.map((pageUuid, index) => ({
-        menuUuid: menu.uuid,
+        menuUuid: currentMenu.uuid,
         pageUuid,
         order: flatItems.length + index,
         parentUuid: null,
       }));
 
-      const response = await fetch(`/api/menus/${menu.uuid}/items`, {
+      const response = await fetch(`/api/menus/${currentMenu.uuid}/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newItems),
@@ -94,7 +98,7 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
     uuid: string,
     updates: { label?: string; parentUuid?: string | null; order?: number }
   ) => {
-    if (!menu) return;
+    if (!currentMenu) return;
 
     try {
       const response = await fetch(`/api/menus/items/${uuid}`, {
@@ -113,10 +117,10 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
   };
 
   const handleMoveItem = async (uuid: string, direction: 'up' | 'down' | 'top' | 'under', targetUuid?: string) => {
-    if (!menu) return;
+    if (!currentMenu) return;
 
     try {
-      const response = await fetch(`/api/menus/${menu.uuid}/items/${uuid}/move`, {
+      const response = await fetch(`/api/menus/${currentMenu.uuid}/items/${uuid}/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ direction, targetUuid }),
@@ -132,7 +136,7 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
   };
 
   const handleRemoveItem = async (uuid: string) => {
-    if (!menu) return;
+    if (!currentMenu) return;
 
     try {
       const response = await fetch(`/api/menus/items/${uuid}`, {
@@ -149,10 +153,10 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
   };
 
   const handleReorder = async (reorderedItems: Array<{ uuid: string; order: number; parentUuid: string | null }>) => {
-    if (!menu) return;
+    if (!currentMenu) return;
 
     try {
-      const response = await fetch(`/api/menus/${menu.uuid}/reorder`, {
+      const response = await fetch(`/api/menus/${currentMenu.uuid}/reorder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reorderedItems),
@@ -168,8 +172,6 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
   };
 
   const handleSaveMenu = async () => {
-    if (!menu) return;
-
     if (!menuName.trim()) {
       await showError('O nome do menu é obrigatório');
       return;
@@ -177,32 +179,56 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
 
     setSaving(true);
     try {
-      const response = await fetch(`/api/menus/${menu.uuid}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: menuName,
-          slug: menuSlug,
-          description: menuDescription || null,
-          location: menuLocation || null,
-        }),
-      });
+      if (!currentMenu) {
+        const response = await fetch('/api/menus', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: menuName.trim(),
+            location: menuLocation || null,
+          }),
+        });
 
-      if (!response.ok) throw new Error('Erro ao salvar menu');
+        if (!response.ok) {
+          let errorMessage = 'Erro ao criar menu';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } catch {
+            errorMessage = `Erro ${response.status}: ${response.statusText}`;
+          }
+          throw new Error(errorMessage);
+        }
 
-      await showSuccess('Menu salvo com sucesso');
-      onSave();
-    } catch (error) {
+        const newMenu = await response.json();
+        setCurrentMenu(newMenu);
+        setMenuCreated(true);
+        await showSuccess('Menu criado com sucesso');
+        await fetchMenuItems();
+      } else {
+        const response = await fetch(`/api/menus/${currentMenu.uuid}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: menuName.trim(),
+            location: menuLocation || null,
+          }),
+        });
+
+        if (!response.ok) throw new Error('Erro ao salvar menu');
+
+        const updatedMenu = await response.json();
+        setCurrentMenu(updatedMenu);
+        await showSuccess('Menu salvo com sucesso');
+        onSave();
+      }
+    } catch (error: any) {
       console.error('Erro ao salvar menu:', error);
-      await showError('Erro ao salvar menu');
+      await showError(error.message || 'Erro ao salvar menu');
     } finally {
       setSaving(false);
     }
   };
-
-  if (!menu) {
-    return <div className="text-center text-zinc-500">Menu não encontrado</div>;
-  }
 
   return (
     <div className="space-y-6">
@@ -216,25 +242,7 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
               value={menuName}
               onChange={(e) => setMenuName(e.target.value)}
               placeholder="Menu Principal"
-            />
-          </div>
-          <div>
-            <Label htmlFor="menu-slug">Slug</Label>
-            <Input
-              id="menu-slug"
-              value={menuSlug}
-              onChange={(e) => setMenuSlug(e.target.value)}
-              placeholder="main-menu"
-            />
-          </div>
-          <div>
-            <Label htmlFor="menu-description">Descrição</Label>
-            <Textarea
-              id="menu-description"
-              value={menuDescription}
-              onChange={(e) => setMenuDescription(e.target.value)}
-              placeholder="Descrição do menu (opcional)"
-              rows={3}
+              disabled={saving}
             />
           </div>
           <div>
@@ -243,7 +251,8 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
               id="menu-location"
               value={menuLocation}
               onChange={(e) => setMenuLocation(e.target.value)}
-              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+              disabled={saving}
+              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
             >
               <option value="header">Header Menu</option>
               <option value="footer">Footer Menu</option>
@@ -253,17 +262,21 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div>
+        <div className={menuCreated && currentMenu ? '' : 'opacity-50 pointer-events-none'}>
           <AddMenuItemsPanel onAddItems={handleAddItems} />
         </div>
-        <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+        <div className={`rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900 ${menuCreated && currentMenu ? '' : 'opacity-50'}`}>
           <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">Estrutura do menu</h3>
           <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
             Arraste os itens para colocá-los na ordem desejada. Clique na seta à direita do item
             para mostrar opções de configuração adicionais.
           </p>
 
-          {loading ? (
+          {!menuCreated || !currentMenu ? (
+            <div className="py-8 text-center text-sm text-zinc-500">
+              Salve o menu para começar a adicionar páginas.
+            </div>
+          ) : loading ? (
             <div className="py-8 text-center text-sm text-zinc-500">Carregando itens...</div>
           ) : items.length === 0 ? (
             <div className="py-8 text-center text-sm text-zinc-500">
@@ -287,7 +300,13 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
           onClick={handleSaveMenu}
           disabled={saving}
         >
-          {saving ? 'Salvando...' : 'Salvar menu'}
+          {saving
+            ? currentMenu
+              ? 'Salvando...'
+              : 'Criando...'
+            : currentMenu
+              ? 'Salvar menu'
+              : 'Criar menu'}
         </Button>
       </div>
     </div>
