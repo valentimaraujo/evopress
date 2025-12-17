@@ -27,7 +27,7 @@ export const posts = pgTable('posts', {
   slug: text('slug').notNull().unique(),
   excerpt: text('excerpt'),
   status: text('status', { enum: ['draft', 'published', 'archived'] }).notNull().default('draft'),
-  postType: text('post_type', { enum: ['post', 'page', 'custom'] }).notNull().default('post'),
+  postType: text('post_type', { enum: ['post', 'page'] }).notNull().default('post'),
   contentBlocks: jsonb('content_blocks').default([]),
   metaData: jsonb('meta_data').default({}),
   seoTitle: text('seo_title'),
@@ -70,6 +70,7 @@ export const settings = pgTable('settings', {
   value: jsonb('value'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (table) => [
   index(`idx_${tablePrefix}_settings_key`).on(table.key),
   index(`idx_${tablePrefix}_settings_value`).on(table.value),

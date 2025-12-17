@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!, 10) : undefined;
     const search = searchParams.get('search') || undefined;
     const status = searchParams.get('status') as 'draft' | 'published' | 'archived' | undefined;
-    const postType = searchParams.get('postType') as 'post' | 'page' | 'custom' | undefined;
+    const postType = searchParams.get('postType') as 'post' | 'page' | undefined;
     const authorUuid = searchParams.get('authorUuid') || undefined;
 
     const result = await listPosts({

@@ -1,12 +1,12 @@
 import { hash } from 'bcryptjs';
 import { execSync } from 'child_process';
 import { config } from 'dotenv';
+import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
 import * as schema from '../db/schema';
 import { users, settings } from '../db/schema';
-import { eq } from 'drizzle-orm';
 
 // 1. Carregar configuração
 config({ path: '.env.local' });
@@ -25,12 +25,26 @@ async function main() {
   try {
     // 2. Aplicar Schema (Tabelas) via Drizzle Kit
     // Usamos execSync para garantir que o push termine antes de prosseguir
+    // Cria/atualiza todas as tabelas definidas no schema:
+    // - users, posts, media (tabelas base)
+    // - menus, menu_items (sistema de menus)
+    // - settings (configurações do sistema)
     console.log('📦 Criando/Atualizando tabelas no banco...');
+    console.log('   Tabelas a serem criadas/atualizadas:');
+    console.log('   - evopress_users');
+    console.log('   - evopress_posts');
+    console.log('   - evopress_media');
+    console.log('   - evopress_menus (nova)');
+    console.log('   - evopress_menu_items (nova)');
+    console.log('   - evopress_settings (nova)');
     try {
       execSync('npx drizzle-kit push', { stdio: 'inherit' });
-      console.log('✅ Tabelas sincronizadas.');
-    } catch {
+      console.log('✅ Tabelas sincronizadas com sucesso.');
+    } catch (error: any) {
       console.error('❌ Falha ao sincronizar tabelas via drizzle-kit.');
+      console.error('   Erro:', error.message || 'Erro desconhecido');
+      console.error('   Verifique se o DATABASE_URL está correto no .env.local');
+      console.error('   Se as dependências já estão instaladas, tente: npm run setup:skip-install');
       process.exit(1);
     }
 
@@ -40,12 +54,15 @@ async function main() {
 
     try {
       // 4. Criar Índices de Performance (GIN)
+      // Índices GIN são otimizados para busca em campos JSONB
       console.log('⚡ Otimizando banco de dados (Índices GIN)...');
       
       const indexes = [
+        // Índices para campos JSONB
         `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_users_meta_data ON ${tablePrefix}_users USING GIN (meta_data)`,
         `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_content_blocks ON ${tablePrefix}_posts USING GIN (content_blocks)`, // eslint-disable-line max-len
-        `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_meta_data ON ${tablePrefix}_posts USING GIN (meta_data)`
+        `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_posts_meta_data ON ${tablePrefix}_posts USING GIN (meta_data)`,
+        `CREATE INDEX IF NOT EXISTS idx_${tablePrefix}_settings_value ON ${tablePrefix}_settings USING GIN (value)`
       ];
 
       for (const query of indexes) {
