@@ -9,7 +9,16 @@ export async function GET() {
   try {
     const settings = await getReadingSettings();
     return formatJSONResponse(settings);
-  } catch {
+  } catch (error: any) {
+    console.error('Erro ao buscar configurações de leitura:', error);
+    
+    if (error?.message) {
+      return formatJSONResponse(
+        { error: `Erro ao buscar configurações: ${error.message}` },
+        { status: 500 }
+      );
+    }
+    
     return formatJSONResponse(
       { error: 'Erro ao buscar configurações de leitura' },
       { status: 500 }
@@ -45,11 +54,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await setReadingSettings(body);
-    const updatedSettings = await getReadingSettings();
-
-    return formatJSONResponse(updatedSettings);
-  } catch {
+    try {
+      await setReadingSettings(body);
+      const updatedSettings = await getReadingSettings();
+      return formatJSONResponse(updatedSettings);
+    } catch (dbError: any) {
+      console.error('Erro ao salvar configurações no banco de dados:', dbError);
+      
+      // Mensagens de erro mais específicas
+      if (dbError?.code === '23505') {
+        return formatJSONResponse(
+          { error: 'Configuração já existe. Tente atualizar ao invés de criar.' },
+          { status: 409 }
+        );
+      }
+      
+      if (dbError?.code === '23503') {
+        return formatJSONResponse(
+          { error: 'Referência inválida. Verifique se a página selecionada existe.' },
+          { status: 400 }
+        );
+      }
+      
+      if (dbError?.message) {
+        return formatJSONResponse(
+          { error: `Erro no banco de dados: ${dbError.message}` },
+          { status: 500 }
+        );
+      }
+      
+      return formatJSONResponse(
+        { error: 'Erro ao salvar configurações no banco de dados' },
+        { status: 500 }
+      );
+    }
+  } catch (error: any) {
+    console.error('Erro geral ao processar requisição de configurações:', error);
+    
+    if (error instanceof SyntaxError) {
+      return formatJSONResponse(
+        { error: 'Formato de dados inválido' },
+        { status: 400 }
+      );
+    }
+    
+    if (error?.message) {
+      return formatJSONResponse(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
+    
     return formatJSONResponse(
       { error: 'Erro ao salvar configurações de leitura' },
       { status: 500 }

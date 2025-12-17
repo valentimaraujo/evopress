@@ -1,12 +1,15 @@
 'use client';
 
+import { FormikProvider, useFormik } from 'formik';
 import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { FormInput } from '@/components/ui/FormInput';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { showError } from '@/core/utils/swal';
+import { imageBlockSchema } from '@/core/validations';
 
 import type { ImageBlock } from '../types';
 
@@ -19,13 +22,34 @@ interface ImageSettingsProps {
 export function ImageSettings({ block, onChange, onUpload }: ImageSettingsProps) {
   const [uploading, setUploading] = useState(false);
 
+  const formik = useFormik<ImageBlock>({
+    initialValues: block,
+    validationSchema: imageBlockSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      onChange(values);
+    },
+  });
+
+  useEffect(() => {
+    const hasChanges = 
+      formik.values.url !== block.url ||
+      formik.values.alt !== block.alt;
+    
+    if (hasChanges) {
+      onChange(formik.values);
+    }
+     
+  }, [formik.values.url, formik.values.alt]);
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setUploading(true);
       try {
-        const url = await onUpload(file);
-        onChange({ ...block, url });
+        const uploadedUrl = await onUpload(file);
+        formik.setFieldValue('url', uploadedUrl);
+        onChange({ ...formik.values, url: uploadedUrl });
       } catch {
         await showError('Erro ao fazer upload da imagem.');
       } finally {
@@ -35,25 +59,19 @@ export function ImageSettings({ block, onChange, onUpload }: ImageSettingsProps)
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="image-url">URL da Imagem</Label>
-        <Input
-          id="image-url"
-          value={block.url}
-          onChange={(e) => onChange({ ...block, url: e.target.value })}
-          placeholder="https://exemplo.com/imagem.jpg"
-        />
-      </div>
-      <div>
-        <Label htmlFor="image-alt">Texto Alternativo</Label>
-        <Input
-          id="image-alt"
-          value={block.alt}
-          onChange={(e) => onChange({ ...block, alt: e.target.value })}
-          placeholder="Descrição da imagem"
-        />
-      </div>
+    <FormikProvider value={formik}>
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
+      <FormInput
+        name="url"
+        label="URL da Imagem"
+        required
+        placeholder="https://exemplo.com/imagem.jpg"
+      />
+      <FormInput
+        name="alt"
+        label="Texto Alternativo"
+        placeholder="Descrição da imagem"
+      />
       <div>
         <Label htmlFor="image-upload">Upload de Imagem</Label>
         <Input
@@ -62,6 +80,7 @@ export function ImageSettings({ block, onChange, onUpload }: ImageSettingsProps)
           accept="image/*"
           onChange={handleFileChange}
           disabled={uploading}
+          className="mt-2"
         />
         {uploading && (
           <p className="mt-2 flex items-center text-sm text-zinc-500 dark:text-zinc-400">
@@ -70,13 +89,13 @@ export function ImageSettings({ block, onChange, onUpload }: ImageSettingsProps)
           </p>
         )}
       </div>
-      {block.url && (
+      {formik.values.url && (
         <div className="mt-4">
           <Label>Preview</Label>
           <div className="mt-2 flex justify-center rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
             <Image
-              src={block.url}
-              alt={block.alt || 'Imagem'}
+              src={formik.values.url}
+              alt={formik.values.alt || 'Imagem'}
               width={300}
               height={200}
               className="max-w-full h-auto rounded-lg"
@@ -85,7 +104,8 @@ export function ImageSettings({ block, onChange, onUpload }: ImageSettingsProps)
           </div>
         </div>
       )}
-    </div>
+      </form>
+    </FormikProvider>
   );
 }
 

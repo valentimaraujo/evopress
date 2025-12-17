@@ -61,6 +61,7 @@ function MenuItemRow({ item, isExpanded, onToggleExpand, onEdit, isDragging }: M
     >
       <div style={{ marginLeft: `${item.depth * 24}px` }} className="flex items-center gap-2 flex-1">
         <button
+          type="button"
           {...attributes}
           {...listeners}
           className="cursor-grab text-zinc-400 hover:text-zinc-600 active:cursor-grabbing dark:hover:text-zinc-300"
@@ -69,6 +70,7 @@ function MenuItemRow({ item, isExpanded, onToggleExpand, onEdit, isDragging }: M
         </button>
         {hasChildren ? (
           <button
+            type="button"
             onClick={onToggleExpand}
             className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
@@ -90,6 +92,7 @@ function MenuItemRow({ item, isExpanded, onToggleExpand, onEdit, isDragging }: M
           )}
         </div>
         <button
+          type="button"
           onClick={onEdit}
           className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
         >

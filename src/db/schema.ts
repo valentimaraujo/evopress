@@ -70,7 +70,6 @@ export const settings = pgTable('settings', {
   value: jsonb('value'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-  deletedAt: timestamp('deleted_at', { withTimezone: true }),
 }, (table) => [
   index(`idx_${tablePrefix}_settings_key`).on(table.key),
   index(`idx_${tablePrefix}_settings_value`).on(table.value),

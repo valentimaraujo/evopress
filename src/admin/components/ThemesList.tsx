@@ -125,11 +125,16 @@ export function ThemesList({ onThemeActivated }: ThemesListProps) {
                 variant={theme.name === activeTheme ? 'primary' : 'secondary'}
                 className="w-full"
               >
-                {activating === theme.name
-                  ? 'Ativando...'
-                  : theme.name === activeTheme
-                    ? 'Ativo'
-                    : 'Ativar Tema'}
+                {activating === theme.name ? (
+                  <>
+                    <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                    Ativando...
+                  </>
+                ) : theme.name === activeTheme ? (
+                  'Ativo'
+                ) : (
+                  'Ativar Tema'
+                )}
               </Button>
             </div>
           ))}

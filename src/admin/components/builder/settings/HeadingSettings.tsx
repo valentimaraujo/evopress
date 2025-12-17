@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import { FormikProvider, useFormik } from 'formik';
+import React, { useEffect } from 'react';
 
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
+import { FormInput } from '@/components/ui/FormInput';
+import { FormSelect } from '@/components/ui/FormSelect';
+import { headingBlockSchema } from '@/core/validations';
 
 import type { HeadingBlock } from '../types';
 
@@ -14,14 +15,34 @@ interface HeadingSettingsProps {
 }
 
 export function HeadingSettings({ block, onChange }: HeadingSettingsProps) {
+  const formik = useFormik<HeadingBlock>({
+    initialValues: block,
+    validationSchema: headingBlockSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      onChange(values);
+    },
+  });
+
+  useEffect(() => {
+    const hasChanges = 
+      formik.values.level !== block.level ||
+      formik.values.content !== block.content;
+    
+    if (hasChanges) {
+      onChange(formik.values);
+    }
+     
+  }, [formik.values.level, formik.values.content]);
+
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="heading-level">Nível do Título</Label>
-        <Select
-          id="heading-level"
-          value={block.level}
-          onChange={(e) => onChange({ ...block, level: parseInt(e.target.value, 10) as HeadingBlock['level'] })}
+    <FormikProvider value={formik}>
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
+        <FormSelect
+          name="level"
+          label="Nível do Título"
+          required
+          type="number"
         >
           <option value={1}>H1</option>
           <option value={2}>H2</option>
@@ -29,18 +50,15 @@ export function HeadingSettings({ block, onChange }: HeadingSettingsProps) {
           <option value={4}>H4</option>
           <option value={5}>H5</option>
           <option value={6}>H6</option>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="heading-content">Conteúdo</Label>
-        <Input
-          id="heading-content"
-          value={block.content}
-          onChange={(e) => onChange({ ...block, content: e.target.value })}
+        </FormSelect>
+        <FormInput
+          name="content"
+          label="Conteúdo"
+          required
           placeholder="Digite o título..."
         />
-      </div>
-    </div>
+      </form>
+    </FormikProvider>
   );
 }
 

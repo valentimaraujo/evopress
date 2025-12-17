@@ -488,12 +488,17 @@ export function PostsList({ defaultPostType }: PostsListProps = {}) {
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDeletePost(post)}
                           disabled={deletingPostId === post.uuid}
                           className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Excluir post"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {deletingPostId === post.uuid ? (
+                            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></span>
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </td>
