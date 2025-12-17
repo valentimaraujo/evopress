@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await setReadingSettings(body, payload.sub);
+    await setReadingSettings(body);
     const updatedSettings = await getReadingSettings();
 
     return formatJSONResponse(updatedSettings);
