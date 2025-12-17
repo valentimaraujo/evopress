@@ -10,7 +10,8 @@ import {
   ChevronLeft,
   Menu as MenuIcon,
   Settings,
-  Navigation
+  Navigation,
+  Palette
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -40,6 +41,7 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
     { href: '/admin/media', label: 'Mídia', icon: ImageIcon },
     { href: '/admin/users', label: 'Usuários', icon: Users },
     { href: '/admin/settings/reading', label: 'Configurações', icon: Settings },
+    { href: '/admin/settings/themes', label: 'Temas', icon: Palette },
   ];
 
   return (

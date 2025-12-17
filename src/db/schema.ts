@@ -64,6 +64,19 @@ export const media = pgTable('media', {
   index(`idx_${tablePrefix}_media_deleted_at`).on(table.deletedAt),
 ]);
 
+export const settings = pgTable('settings', {
+  uuid: uuid('uuid').defaultRandom().primaryKey(),
+  key: text('key').notNull().unique(),
+  value: jsonb('value'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+}, (table) => [
+  index(`idx_${tablePrefix}_settings_key`).on(table.key),
+  index(`idx_${tablePrefix}_settings_value`).on(table.value),
+]);
+
+// --- MENUS ---
 export const menus = pgTable('menus', {
   uuid: uuid('uuid').defaultRandom().primaryKey(),
   name: text('name').notNull(),
@@ -76,6 +89,7 @@ export const menus = pgTable('menus', {
   index(`idx_${tablePrefix}_menus_deleted_at`).on(table.deletedAt),
 ]);
 
+// --- MENU ITEMS ---
 export const menuItems = pgTable('menu_items', {
   uuid: uuid('uuid').defaultRandom().primaryKey(),
   menuUuid: uuid('menu_uuid').notNull().references(() => menus.uuid),
@@ -93,14 +107,4 @@ export const menuItems = pgTable('menu_items', {
   index(`idx_${tablePrefix}_menu_items_parent_uuid`).on(table.parentUuid),
   index(`idx_${tablePrefix}_menu_items_order`).on(table.order),
   index(`idx_${tablePrefix}_menu_items_deleted_at`).on(table.deletedAt),
-]);
-
-export const settings = pgTable('settings', {
-  uuid: uuid('uuid').defaultRandom().primaryKey(),
-  key: text('key').notNull().unique(),
-  value: jsonb('value').notNull(),
-  updatedBy: uuid('updated_by').references(() => users.uuid),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => [
-  index(`idx_${tablePrefix}_settings_key`).on(table.key),
 ]);
