@@ -22,9 +22,10 @@ import { getTiptapExtensions } from './builder/utils/tiptap-extensions';
 interface PostEditorProps {
   post?: Post | null;
   mode?: 'visual' | 'simple';
+  defaultPostType?: PostType;
 }
 
-export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorProps) {
+export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType }: PostEditorProps) {
   const router = useRouter();
   const [mode, setMode] = useState<'visual' | 'simple'>(initialMode || 'simple');
   const [saving, setSaving] = useState(false);
@@ -32,7 +33,7 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
   const [slug, setSlug] = useState(post?.slug || '');
   const [excerpt, setExcerpt] = useState(post?.excerpt || '');
   const [status, setStatus] = useState<PostStatus>(post?.status || 'draft');
-  const [postType, setPostType] = useState<PostType>(post?.postType || 'post');
+  const [postType, setPostType] = useState<PostType>(post?.postType || defaultPostType || 'post');
   const [seoTitle, setSeoTitle] = useState(post?.seoTitle || '');
   const [seoDescription, setSeoDescription] = useState(post?.seoDescription || '');
   const [seoKeywords, setSeoKeywords] = useState(post?.seoKeywords?.join(', ') || '');
@@ -152,7 +153,8 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
         }
       }
 
-      router.push(`/admin/posts/${savedPost.uuid}`);
+      const basePath = savedPost.postType === 'page' ? '/admin/pages' : '/admin/posts';
+      router.push(`${basePath}/${savedPost.uuid}`);
       router.refresh();
     } catch {
       await showError('Erro ao salvar o post');
@@ -209,7 +211,7 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
       <div className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            {post ? 'Editar Post' : 'Novo Post'}
+            {post ? (post.postType === 'page' ? 'Editar Página' : 'Editar Post') : (defaultPostType === 'page' ? 'Nova Página' : 'Novo Post')}
           </h1>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-800">
@@ -322,18 +324,20 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
                   </Select>
                 </div>
 
-                <div>
-                  <Label htmlFor="postType">Tipo</Label>
-                  <Select
-                    id="postType"
-                    value={postType}
-                    onChange={(e) => setPostType(e.target.value as PostType)}
-                    className="mt-2"
-                  >
-                    <option value="post">Post</option>
-                    <option value="page">Página</option>
-                  </Select>
-                </div>
+                {!defaultPostType && (
+                  <div>
+                    <Label htmlFor="postType">Tipo</Label>
+                    <Select
+                      id="postType"
+                      value={postType}
+                      onChange={(e) => setPostType(e.target.value as PostType)}
+                      className="mt-2"
+                    >
+                      <option value="post">Post</option>
+                      <option value="page">Página</option>
+                    </Select>
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="excerpt">Resumo</Label>

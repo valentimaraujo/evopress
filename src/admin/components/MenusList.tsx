@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
@@ -103,20 +103,15 @@ export function MenusList() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => router.push(`/admin/menus/${menu.uuid}`)}
-                    className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-700 dark:hover:text-indigo-400"
+                    className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
                     title="Editar menu"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(menu)}
                     disabled={deletingMenuId === menu.uuid}
-                    className={`rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 
-                      dark:hover:bg-red-900/20 dark:hover:text-red-400 ${
-                      deletingMenuId === menu.uuid
-                        ? 'opacity-50 cursor-not-allowed'
-                        : ''
-                    }`}
+                    className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Excluir menu"
                   >
                     <Trash2 className="h-4 w-4" />

@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { 
   LayoutDashboard, 
   FileText, 
+  File,
   Image as ImageIcon, 
   Users, 
   LogOut, 
@@ -36,7 +37,8 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
 
   const menuItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/admin/posts', label: 'Posts', icon: FileText },
+    { href: '/admin/posts', label: 'Postagens', icon: FileText },
+    { href: '/admin/pages', label: 'Páginas', icon: File },
     { href: '/admin/menus', label: 'Menus', icon: Navigation },
     { href: '/admin/media', label: 'Mídia', icon: ImageIcon },
     { href: '/admin/users', label: 'Usuários', icon: Users },
@@ -84,7 +86,9 @@ export function Sidebar({ systemName, user, isCollapsed: externalCollapsed, onTo
               </p>
             </div>
             {menuItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || 
+                (item.href === '/admin/posts' && pathname?.startsWith('/admin/posts')) ||
+                (item.href === '/admin/pages' && pathname?.startsWith('/admin/pages'));
               return (
                 <Link 
                   key={item.href}

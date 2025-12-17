@@ -42,7 +42,11 @@ interface User {
   email: string;
 }
 
-export function PostsList() {
+interface PostsListProps {
+  defaultPostType?: 'post' | 'page';
+}
+
+export function PostsList({ defaultPostType }: PostsListProps = {}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -53,7 +57,9 @@ export function PostsList() {
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
-  const [typeFilter, setTypeFilter] = useState(searchParams.get('postType') || '');
+  const [typeFilter, setTypeFilter] = useState(
+    searchParams.get('postType') || defaultPostType || ''
+  );
   const [authorFilter, setAuthorFilter] = useState(searchParams.get('authorUuid') || '');
   const [currentPage, setCurrentPage] = useState(
     parseInt(searchParams.get('page') || '1', 10)
@@ -122,12 +128,13 @@ export function PostsList() {
   };
 
   useEffect(() => {
+    const effectiveTypeFilter = typeFilter || defaultPostType || '';
     const timeoutId = setTimeout(() => {
-      fetchPosts(currentPage, search, statusFilter, typeFilter, authorFilter);
+      fetchPosts(currentPage, search, statusFilter, effectiveTypeFilter, authorFilter);
     }, search ? 300 : 0);
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, search, statusFilter, typeFilter, authorFilter]);
+  }, [currentPage, search, statusFilter, typeFilter, authorFilter, defaultPostType]);
 
   const updateURL = (updates: {
     search?: string;
@@ -178,7 +185,8 @@ export function PostsList() {
       }
     }
     
-    router.push(`/admin/posts?${params.toString()}`, { scroll: false });
+    const basePath = defaultPostType === 'page' ? '/admin/pages' : '/admin/posts';
+    router.push(`${basePath}?${params.toString()}`, { scroll: false });
   };
 
   const handleSearchChange = (value: string) => {
@@ -333,15 +341,17 @@ export function PostsList() {
             <option value="archived">Arquivado</option>
           </select>
 
-          <select
-            value={typeFilter}
-            onChange={(e) => handleTypeChange(e.target.value)}
-            className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
-          >
-            <option value="">Todos os tipos</option>
-            <option value="post">Post</option>
-            <option value="page">Página</option>
-          </select>
+          {!defaultPostType && (
+            <select
+              value={typeFilter}
+              onChange={(e) => handleTypeChange(e.target.value)}
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+            >
+              <option value="">Todos os tipos</option>
+              <option value="post">Post</option>
+              <option value="page">Página</option>
+            </select>
+          )}
 
           <select
             value={authorFilter}
@@ -468,7 +478,10 @@ export function PostsList() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => router.push(`/admin/posts/${post.uuid}`)}
+                          onClick={() => {
+                            const basePath = defaultPostType === 'page' ? '/admin/pages' : '/admin/posts';
+                            router.push(`${basePath}/${post.uuid}`);
+                          }}
                           className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
                           title="Editar post"
                         >
