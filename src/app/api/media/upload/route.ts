@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       filePath: mediaItem.filePath,
       url: mediaItem.filePath,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erro ao fazer upload:', error);
     return formatJSONResponse(
       { error: 'Erro ao fazer upload do arquivo' },

@@ -47,14 +47,14 @@ export async function setSetting(key: string, value: unknown): Promise<void> {
     await db
       .update(settings)
       .set({
-        value: value as any,
+        value: value as Record<string, unknown> | unknown[] | string | number | boolean | null,
         updatedAt: new Date(),
       })
       .where(eq(settings.key, key));
   } else {
     await db.insert(settings).values({
       key,
-      value: value as any,
+      value: value as Record<string, unknown> | unknown[] | string | number | boolean | null,
       createdAt: new Date(),
       updatedAt: new Date(),
     });

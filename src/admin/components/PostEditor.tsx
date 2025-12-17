@@ -34,9 +34,6 @@ export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType
   const [blocks, setBlocks] = useState<ContentBlock[]>(
     (post?.contentBlocks as ContentBlock[]) || []
   );
-  const [isHomepage, setIsHomepage] = useState(
-    (post?.metaData as Record<string, unknown>)?.isHomepage === true
-  );
 
   const formik = useFormik<PostFormValues>({
     initialValues: {
@@ -66,7 +63,6 @@ export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType
           contentBlocks: blocks,
           metaData: {
             editorMode: mode,
-            isHomepage: values.postType === 'page' && isHomepage ? true : undefined,
           },
           seoTitle: values.seoTitle || null,
           seoDescription: values.seoDescription || null,
@@ -90,23 +86,12 @@ export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType
 
         const savedPost = await response.json();
 
-        if (values.postType === 'page' && isHomepage && savedPost.uuid) {
-          try {
-            await fetch('/api/settings/homepage', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ pageUuid: savedPost.uuid }),
-            });
-          } catch {
-            // Silenciosamente falha se não conseguir definir homepage
-          }
-        }
-
         const basePath = savedPost.postType === 'page' ? '/admin/pages' : '/admin/posts';
         router.push(`${basePath}/${savedPost.uuid}`);
         router.refresh();
-      } catch (error: any) {
-        await showError(error.message || 'Erro ao salvar o post');
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar o post';
+        await showError(errorMessage);
       } finally {
         setSubmitting(false);
       }
@@ -161,8 +146,6 @@ export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType
         contentBlocks: blocks,
         metaData: post.metaData || null,
       });
-      const metaData = post.metaData as Record<string, unknown> | null;
-      setIsHomepage(metaData?.isHomepage === true);
     }
      
   }, [post]);
@@ -360,21 +343,6 @@ export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType
                   autoResize
                 />
 
-                {formik.values.postType === 'page' && (
-                  <div>
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={isHomepage}
-                        onChange={(e) => setIsHomepage(e.target.checked)}
-                        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                        Definir como página inicial
-                      </span>
-                    </label>
-                  </div>
-                )}
               </div>
             </div>
 

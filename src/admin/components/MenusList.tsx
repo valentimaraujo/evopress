@@ -50,8 +50,9 @@ export function MenusList() {
 
       await showSuccess('Menu excluído com sucesso');
       fetchMenus();
-    } catch (error: any) {
-      await showError(error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir menu';
+      await showError(errorMessage);
     } finally {
       setDeletingMenuId(null);
     }

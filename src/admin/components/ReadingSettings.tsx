@@ -36,8 +36,9 @@ export function ReadingSettings() {
         }
 
         await showSuccess('Configurações salvas com sucesso');
-      } catch (error: any) {
-        await showError(error.message);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar configurações';
+        await showError(errorMessage);
       } finally {
         setSubmitting(false);
       }
@@ -65,7 +66,7 @@ export function ReadingSettings() {
         homepagePage: data.homepagePage || null,
         postsPage: data.postsPage || null,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao buscar configurações:', error);
       await showError(error.message || 'Erro ao carregar configurações. Tente recarregar a página.');
     } finally {

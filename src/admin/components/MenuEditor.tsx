@@ -77,9 +77,10 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
           await showSuccess('Menu salvo com sucesso');
           onSave();
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Erro ao salvar menu:', error);
-        await showError(error.message || 'Erro ao salvar menu');
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar menu';
+        await showError(errorMessage);
       } finally {
         setSubmitting(false);
       }

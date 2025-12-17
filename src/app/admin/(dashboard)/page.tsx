@@ -13,8 +13,8 @@ async function getStats() {
   const [userCount] = await db.select({ count: count() }).from(users);
   return {
     users: userCount?.count || 0,
-    posts: 0, // Implementar depois
-    media: 0, // Implementar depois
+    posts: 0,
+    media: 0,
   };
 }
 

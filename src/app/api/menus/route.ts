@@ -50,13 +50,13 @@ export async function POST(request: NextRequest) {
 
     const menu = await createMenu(body);
     return formatJSONResponse(menu, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao criar menu:', error);
     
     let errorMessage = 'Erro ao criar menu';
     let statusCode = 500;
     
-    if (error.message && !error.message.includes('Failed query') && !error.message.includes('SQL')) {
+    if (error instanceof Error && error.message && !error.message.includes('Failed query') && !error.message.includes('SQL')) {
       errorMessage = error.message;
     }
     

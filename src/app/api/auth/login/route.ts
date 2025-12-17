@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Login error:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
   }

@@ -23,7 +23,14 @@ export async function verifyPassword(plain: string, hashed: string): Promise<boo
   return compare(plain, hashed);
 }
 
-export async function signToken(payload: any): Promise<string> {
+export interface JwtPayload {
+  sub: string;
+  email?: string;
+  role?: string;
+  [key: string]: unknown;
+}
+
+export async function signToken(payload: JwtPayload): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
