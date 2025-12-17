@@ -5,7 +5,8 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
 import * as schema from '../db/schema';
-import { users } from '../db/schema';
+import { users, settings } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 // 1. Carregar configuração
 config({ path: '.env.local' });
@@ -87,6 +88,24 @@ async function main() {
         console.log('\n✅ ADMIN CRIADO COM SUCESSO!');
         console.log(`   Email: ${adminEmail}`);
         console.log('   (Altere a senha após o primeiro login!)');
+      }
+
+      // 6. Inicializar Tema Ativo
+      console.log('🎨 Verificando tema ativo...');
+      const existingTheme = await db
+        .select()
+        .from(settings)
+        .where(eq(settings.key, 'active_theme'))
+        .limit(1);
+
+      if (existingTheme.length === 0) {
+        await db.insert(settings).values({
+          key: 'active_theme',
+          value: 'base',
+        });
+        console.log('✅ Tema ativo inicializado: base');
+      } else {
+        console.log('ℹ️  Tema ativo já configurado.');
       }
 
     } finally {
