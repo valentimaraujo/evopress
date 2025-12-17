@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
 
-import { formatJSONResponse } from '@/core/utils/format-json-response';
 import { getAvailableThemes, getActiveTheme, setActiveTheme, themeExists } from '@/core/services/themes.service';
 import { verifyToken } from '@/core/utils/auth';
 import { getSessionCookie } from '@/core/utils/cookies';
+import { formatJSONResponse } from '@/core/utils/format-json-response';
 
 export async function GET() {
   try {
