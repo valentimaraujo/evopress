@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import { FormikProvider, useFormik } from 'formik';
+import React, { useEffect } from 'react';
 
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
+import { FormInput } from '@/components/ui/FormInput';
+import { spacerBlockSchema } from '@/core/validations';
 
 import type { SpacerBlock } from '../types';
 
@@ -13,19 +14,34 @@ interface SpacerSettingsProps {
 }
 
 export function SpacerSettings({ block, onChange }: SpacerSettingsProps) {
+  const formik = useFormik<SpacerBlock>({
+    initialValues: block,
+    validationSchema: spacerBlockSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      onChange(values);
+    },
+  });
+
+  useEffect(() => {
+    if (formik.values.height !== block.height) {
+      onChange(formik.values);
+    }
+     
+  }, [formik.values.height]);
+
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="spacer-height">Altura (px)</Label>
-        <Input
-          id="spacer-height"
+    <FormikProvider value={formik}>
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
+        <FormInput
+          name="height"
+          label="Altura (px)"
           type="number"
-          value={block.height}
-          onChange={(e) => onChange({ ...block, height: parseInt(e.target.value, 10) || 40 })}
+          required
           placeholder="40"
         />
-      </div>
-    </div>
+      </form>
+    </FormikProvider>
   );
 }
 

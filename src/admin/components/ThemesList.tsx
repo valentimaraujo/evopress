@@ -68,9 +68,10 @@ export function ThemesList({ onThemeActivated }: ThemesListProps) {
       await showSuccess('Tema ativado com sucesso');
       setActiveTheme(themeName);
       onThemeActivated?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao ativar tema:', error);
-      await showError(error.message || 'Erro ao ativar tema');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao ativar tema';
+      await showError(errorMessage);
     } finally {
       setActivating(null);
     }
@@ -125,11 +126,16 @@ export function ThemesList({ onThemeActivated }: ThemesListProps) {
                 variant={theme.name === activeTheme ? 'primary' : 'secondary'}
                 className="w-full"
               >
-                {activating === theme.name
-                  ? 'Ativando...'
-                  : theme.name === activeTheme
-                    ? 'Ativo'
-                    : 'Ativar Tema'}
+                {activating === theme.name ? (
+                  <>
+                    <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                    Ativando...
+                  </>
+                ) : theme.name === activeTheme ? (
+                  'Ativo'
+                ) : (
+                  'Ativar Tema'
+                )}
               </Button>
             </div>
           ))}

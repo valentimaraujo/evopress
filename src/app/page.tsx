@@ -1,9 +1,12 @@
 import Link from 'next/link';
 import React from 'react';
 
-import { listPosts } from '@/core/services/posts.service';
+import type { ContentBlock } from '@/admin/components/builder/types';
+import { getPost, listPosts } from '@/core/services/posts.service';
+import { getReadingSettings } from '@/core/services/settings.service';
 import { getActiveTheme } from '@/core/services/themes.service';
 import { loadThemeComponent } from '@/core/utils/theme-loader';
+import { PostContent } from '@/theme/components/PostContent';
 
 export default async function Home() {
   const activeTheme = await getActiveTheme();
@@ -14,6 +17,40 @@ export default async function Home() {
     throw new Error(`Componente Layout não encontrado no tema ${activeTheme}`);
   }
 
+  // Buscar configurações de leitura
+  const readingSettings = await getReadingSettings();
+
+  // Se a homepage for uma página estática, renderizar a página
+  if (readingSettings.homepageType === 'page' && readingSettings.homepagePage) {
+    const homepagePage = await getPost(readingSettings.homepagePage);
+
+    // Verificar se a página existe, está publicada e é do tipo 'page'
+    if (
+      homepagePage &&
+      homepagePage.status === 'published' &&
+      homepagePage.postType === 'page'
+    ) {
+      const blocks = (homepagePage.contentBlocks as ContentBlock[]) || [];
+
+      return (
+        <Layout>
+          <article className="mx-auto max-w-4xl px-4 py-12">
+            <header className="mb-8">
+              <h1 className="mb-4 text-4xl font-bold text-zinc-900 dark:text-white">
+                {homepagePage.title}
+              </h1>
+              {homepagePage.excerpt && (
+                <p className="text-lg text-zinc-600 dark:text-zinc-400">{homepagePage.excerpt}</p>
+              )}
+            </header>
+            <PostContent blocks={blocks} />
+          </article>
+        </Layout>
+      );
+    }
+  }
+
+  // Comportamento padrão: mostrar lista de posts
   const { posts } = await listPosts({
     status: 'published',
     postType: 'post',

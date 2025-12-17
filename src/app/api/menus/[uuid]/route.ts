@@ -51,7 +51,7 @@ export async function PUT(
     }
 
     return formatJSONResponse(menu);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erro ao atualizar menu:', error);
     return formatJSONResponse(
       { error: 'Erro ao atualizar menu' },
@@ -79,7 +79,7 @@ export async function DELETE(
     await deleteMenu(uuid);
 
     return formatJSONResponse({ message: 'Menu excluído com sucesso' });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Erro ao excluir menu:', error);
     return formatJSONResponse(
       { error: 'Erro ao excluir menu' },

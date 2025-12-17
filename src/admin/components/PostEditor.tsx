@@ -1,17 +1,20 @@
 'use client';
 
 import { useEditor as useTiptapEditor, EditorContent } from '@tiptap/react';
+import { FormikProvider, useFormik } from 'formik';
 import { Save, Code, Layout } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { FormInput } from '@/components/ui/FormInput';
+import { FormSelect } from '@/components/ui/FormSelect';
+import { FormTextarea } from '@/components/ui/FormTextarea';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
-import { Textarea } from '@/components/ui/Textarea';
 import type { Post, PostStatus, PostType } from '@/core/services/posts.service';
 import { showError } from '@/core/utils/swal';
+import { postSchema, type PostFormValues } from '@/core/validations';
 
 import { BlockEditor } from './builder/BlockEditor';
 import { Toolbar } from './builder/Toolbar';
@@ -22,26 +25,78 @@ import { getTiptapExtensions } from './builder/utils/tiptap-extensions';
 interface PostEditorProps {
   post?: Post | null;
   mode?: 'visual' | 'simple';
+  defaultPostType?: PostType;
 }
 
-export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorProps) {
+export function PostEditor({ post, mode: initialMode = 'simple', defaultPostType }: PostEditorProps) {
   const router = useRouter();
   const [mode, setMode] = useState<'visual' | 'simple'>(initialMode || 'simple');
-  const [saving, setSaving] = useState(false);
-  const [title, setTitle] = useState(post?.title || '');
-  const [slug, setSlug] = useState(post?.slug || '');
-  const [excerpt, setExcerpt] = useState(post?.excerpt || '');
-  const [status, setStatus] = useState<PostStatus>(post?.status || 'draft');
-  const [postType, setPostType] = useState<PostType>(post?.postType || 'post');
-  const [seoTitle, setSeoTitle] = useState(post?.seoTitle || '');
-  const [seoDescription, setSeoDescription] = useState(post?.seoDescription || '');
-  const [seoKeywords, setSeoKeywords] = useState(post?.seoKeywords?.join(', ') || '');
   const [blocks, setBlocks] = useState<ContentBlock[]>(
     (post?.contentBlocks as ContentBlock[]) || []
   );
-  const [isHomepage, setIsHomepage] = useState(
-    (post?.metaData as Record<string, unknown>)?.isHomepage === true
-  );
+
+  const formik = useFormik<PostFormValues>({
+    initialValues: {
+      title: post?.title || '',
+      slug: post?.slug || '',
+      excerpt: post?.excerpt || null,
+      status: (post?.status || 'draft') as PostStatus,
+      postType: (post?.postType || defaultPostType || 'post') as PostType,
+      seoTitle: post?.seoTitle || null,
+      seoDescription: post?.seoDescription || null,
+      seoKeywords: post?.seoKeywords || null,
+      contentBlocks: blocks,
+      metaData: post?.metaData || null,
+    },
+    validationSchema: postSchema,
+    enableReinitialize: true,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const finalSlug = values.slug || (values.title ? generateSlug(values.title) : 'post-' + Date.now());
+
+        const payload = {
+          title: values.title,
+          slug: finalSlug,
+          excerpt: values.excerpt || null,
+          status: values.status || 'draft',
+          postType: values.postType || 'post',
+          contentBlocks: blocks,
+          metaData: {
+            editorMode: mode,
+          },
+          seoTitle: values.seoTitle || null,
+          seoDescription: values.seoDescription || null,
+          seoKeywords: values.seoKeywords && values.seoKeywords.length > 0 ? values.seoKeywords : null,
+        };
+
+        const url = post ? `/api/posts/${post.uuid}` : '/api/posts';
+        const method = post ? 'PUT' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao salvar');
+        }
+
+        const savedPost = await response.json();
+
+        const basePath = savedPost.postType === 'page' ? '/admin/pages' : '/admin/posts';
+        router.push(`${basePath}/${savedPost.uuid}`);
+        router.refresh();
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar o post';
+        await showError(errorMessage);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   const simpleEditor = useTiptapEditor({
     extensions: getTiptapExtensions(),
@@ -79,9 +134,20 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
 
   useEffect(() => {
     if (post) {
-      const metaData = post.metaData as Record<string, unknown> | null;
-      setIsHomepage(metaData?.isHomepage === true);
+      formik.setValues({
+        title: post.title || '',
+        slug: post.slug || '',
+        excerpt: post.excerpt || null,
+        status: (post.status || 'draft') as PostStatus,
+        postType: (post.postType || defaultPostType || 'post') as PostType,
+        seoTitle: post.seoTitle || null,
+        seoDescription: post.seoDescription || null,
+        seoKeywords: post.seoKeywords || null,
+        contentBlocks: blocks,
+        metaData: post.metaData || null,
+      });
     }
+     
   }, [post]);
 
   const handleUploadImage = async (file: File): Promise<string> => {
@@ -101,66 +167,6 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
     return data.url || data.filePath;
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const finalTitle = title || '';
-      const finalSlug = slug || (finalTitle ? generateSlug(finalTitle) : 'post-' + Date.now());
-
-      const payload = {
-        title: finalTitle,
-        slug: finalSlug,
-        excerpt: excerpt || null,
-        status: status || 'draft',
-        postType: postType || 'post',
-        contentBlocks: blocks,
-        metaData: {
-          editorMode: mode,
-          isHomepage: postType === 'page' && isHomepage ? true : undefined,
-        },
-        seoTitle: seoTitle || null,
-        seoDescription: seoDescription || null,
-        seoKeywords: seoKeywords ? seoKeywords.split(',').map((k) => k.trim()) : null,
-      };
-
-      const url = post ? `/api/posts/${post.uuid}` : '/api/posts';
-      const method = post ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao salvar');
-      }
-
-      const savedPost = await response.json();
-
-      if (postType === 'page' && isHomepage && savedPost.uuid) {
-        try {
-          await fetch('/api/settings/homepage', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pageUuid: savedPost.uuid }),
-          });
-        } catch {
-          // Silenciosamente falha se não conseguir definir homepage
-        }
-      }
-
-      router.push(`/admin/posts/${savedPost.uuid}`);
-      router.refresh();
-    } catch {
-      await showError('Erro ao salvar o post');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const generateSlug = (text: string) => {
     return text
       .toLowerCase()
@@ -170,10 +176,10 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
       .replace(/(^-|-$)/g, '');
   };
 
-  const handleTitleChange = (value: string) => {
-    setTitle(value);
-    if (!post || !slug) {
-      setSlug(generateSlug(value));
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    formik.setFieldValue('title', e.target.value);
+    if (!post || !formik.values.slug) {
+      formik.setFieldValue('slug', generateSlug(e.target.value));
     }
   };
 
@@ -205,11 +211,12 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
   };
 
   return (
-    <div className="flex h-full flex-col bg-zinc-50 dark:bg-zinc-950">
-      <div className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <FormikProvider value={formik}>
+      <div className="flex h-full flex-col bg-zinc-50 dark:bg-zinc-950">
+        <div className="border-b border-zinc-200 bg-white px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-            {post ? 'Editar Post' : 'Novo Post'}
+            {post ? (post.postType === 'page' ? 'Editar Página' : 'Editar Post') : (defaultPostType === 'page' ? 'Nova Página' : 'Novo Post')}
           </h1>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-800">
@@ -238,9 +245,18 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
                 Visual
               </button>
             </div>
-            <Button onClick={handleSave} disabled={saving} variant="primary">
-              <Save className="mr-2 h-4 w-4" />
-              {saving ? 'Salvando...' : 'Salvar'}
+            <Button onClick={() => formik.handleSubmit()} disabled={formik.isSubmitting} variant="primary">
+              {formik.isSubmitting ? (
+                <>
+                  <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Salvar
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -250,29 +266,20 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
         <div className="flex h-full gap-6 p-6 overflow-hidden">
           <div className="flex flex-1 flex-col gap-6 overflow-hidden">
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">
-                  Título
-                </Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Digite o título..."
-                  className="mt-2"
-                />
-              </div>
+              <FormInput
+                name="title"
+                label="Título"
+                required
+                placeholder="Digite o título..."
+                onChange={handleTitleChange}
+              />
 
-              <div>
-                <Label htmlFor="slug">Slug</Label>
-                <Input
-                  id="slug"
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  placeholder="url-do-post"
-                  className="mt-2"
-                />
-              </div>
+              <FormInput
+                name="slug"
+                label="Slug"
+                required
+                placeholder="url-do-post"
+              />
             </div>
 
             <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-900">
@@ -308,102 +315,75 @@ export function PostEditor({ post, mode: initialMode = 'simple' }: PostEditorPro
                 Configurações
               </h3>
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    id="status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as PostStatus)}
-                    className="mt-2"
-                  >
-                    <option value="draft">Rascunho</option>
-                    <option value="published">Publicado</option>
-                    <option value="archived">Arquivado</option>
-                  </Select>
-                </div>
+                <FormSelect
+                  name="status"
+                  label="Status"
+                  required
+                >
+                  <option value="draft">Rascunho</option>
+                  <option value="published">Publicado</option>
+                  <option value="archived">Arquivado</option>
+                </FormSelect>
 
-                <div>
-                  <Label htmlFor="postType">Tipo</Label>
-                  <Select
-                    id="postType"
-                    value={postType}
-                    onChange={(e) => setPostType(e.target.value as PostType)}
-                    className="mt-2"
+                {!defaultPostType && (
+                  <FormSelect
+                    name="postType"
+                    label="Tipo"
+                    required
                   >
                     <option value="post">Post</option>
                     <option value="page">Página</option>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="excerpt">Resumo</Label>
-                  <Textarea
-                    id="excerpt"
-                    value={excerpt}
-                    onChange={(e) => setExcerpt(e.target.value)}
-                    placeholder="Breve descrição..."
-                    className="mt-2"
-                    autoResize
-                  />
-                </div>
-
-                {postType === 'page' && (
-                  <div>
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={isHomepage}
-                        onChange={(e) => setIsHomepage(e.target.checked)}
-                        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                        Definir como página inicial
-                      </span>
-                    </label>
-                  </div>
+                  </FormSelect>
                 )}
+
+                <FormTextarea
+                  name="excerpt"
+                  label="Resumo"
+                  placeholder="Breve descrição..."
+                  autoResize
+                />
+
               </div>
             </div>
 
             <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
               <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-white">SEO</h3>
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="seoTitle">Título SEO</Label>
-                  <Input
-                    id="seoTitle"
-                    value={seoTitle}
-                    onChange={(e) => setSeoTitle(e.target.value)}
-                    className="mt-2"
-                  />
-                </div>
+                <FormInput
+                  name="seoTitle"
+                  label="Título SEO"
+                />
 
-                <div>
-                  <Label htmlFor="seoDescription">Descrição SEO</Label>
-                  <Textarea
-                    id="seoDescription"
-                    value={seoDescription}
-                    onChange={(e) => setSeoDescription(e.target.value)}
-                    className="mt-2"
-                    autoResize
-                  />
-                </div>
+                <FormTextarea
+                  name="seoDescription"
+                  label="Descrição SEO"
+                  autoResize
+                />
 
                 <div>
                   <Label htmlFor="seoKeywords">Palavras-chave</Label>
                   <Input
                     id="seoKeywords"
-                    value={seoKeywords}
-                    onChange={(e) => setSeoKeywords(e.target.value)}
+                    value={formik.values.seoKeywords?.join(', ') || ''}
+                    onChange={(e) => {
+                      const keywords = e.target.value
+                        ? e.target.value.split(',').map((k) => k.trim()).filter((k) => k.length > 0)
+                        : null;
+                      formik.setFieldValue('seoKeywords', keywords);
+                    }}
                     placeholder="palavra1, palavra2, palavra3"
                     className="mt-2"
                   />
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    Separe as palavras-chave por vírgulas
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </FormikProvider>
   );
 }

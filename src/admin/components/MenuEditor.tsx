@@ -1,12 +1,14 @@
 'use client';
 
+import { FormikProvider, useFormik } from 'formik';
 import React, { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
+import { FormInput } from '@/components/ui/FormInput';
+import { FormSelect } from '@/components/ui/FormSelect';
 import type { Menu, MenuItem, MenuItemFlat } from '@/core/services/menus.service';
 import { showError, showSuccess } from '@/core/utils/swal';
+import { menuSchema, type MenuFormValues } from '@/core/validations';
 
 import { AddMenuItemsPanel } from './AddMenuItemsPanel';
 import { MenuItemsList } from './MenuItemsList';
@@ -18,19 +20,80 @@ interface MenuEditorProps {
 
 export function MenuEditor({ menu, onSave }: MenuEditorProps) {
   const [currentMenu, setCurrentMenu] = useState<Menu | null>(menu);
-  const [menuName, setMenuName] = useState(menu?.name || '');
-  const [menuLocation, setMenuLocation] = useState(menu?.location || 'header');
   const [items, setItems] = useState<MenuItem[]>([]);
   const [flatItems, setFlatItems] = useState<MenuItemFlat[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [menuCreated, setMenuCreated] = useState(menu !== null);
+
+  const formik = useFormik<MenuFormValues>({
+    initialValues: {
+      name: menu?.name || '',
+      location: menu?.location || 'header',
+    },
+    validationSchema: menuSchema,
+    enableReinitialize: true,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        if (!currentMenu) {
+          const response = await fetch('/api/menus', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: values.name.trim(),
+              location: values.location || null,
+            }),
+          });
+
+          if (!response.ok) {
+            let errorMessage = 'Erro ao criar menu';
+            try {
+              const errorData = await response.json();
+              errorMessage = errorData.error || errorMessage;
+            } catch {
+              errorMessage = `Erro ${response.status}: ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
+          }
+
+          const newMenu = await response.json();
+          setCurrentMenu(newMenu);
+          setMenuCreated(true);
+          await showSuccess('Menu criado com sucesso');
+          await fetchMenuItems();
+        } else {
+          const response = await fetch(`/api/menus/${currentMenu.uuid}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: values.name.trim(),
+              location: values.location || null,
+            }),
+          });
+
+          if (!response.ok) throw new Error('Erro ao salvar menu');
+
+          const updatedMenu = await response.json();
+          setCurrentMenu(updatedMenu);
+          await showSuccess('Menu salvo com sucesso');
+          onSave();
+        }
+      } catch (error: unknown) {
+        console.error('Erro ao salvar menu:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar menu';
+        await showError(errorMessage);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   useEffect(() => {
     if (menu) {
       setCurrentMenu(menu);
-      setMenuName(menu.name);
-      setMenuLocation(menu.location || 'header');
+      formik.setValues({
+        name: menu.name || '',
+        location: menu.location || 'header',
+      });
       setMenuCreated(true);
       fetchMenuItems();
     } else {
@@ -38,7 +101,12 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
       setMenuCreated(false);
       setItems([]);
       setFlatItems([]);
+      formik.setValues({
+        name: '',
+        location: 'header',
+      });
     }
+     
   }, [menu]);
 
   const fetchMenuItems = async () => {
@@ -171,145 +239,84 @@ export function MenuEditor({ menu, onSave }: MenuEditorProps) {
     }
   };
 
-  const handleSaveMenu = async () => {
-    if (!menuName.trim()) {
-      await showError('O nome do menu é obrigatório');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      if (!currentMenu) {
-        const response = await fetch('/api/menus', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: menuName.trim(),
-            location: menuLocation || null,
-          }),
-        });
-
-        if (!response.ok) {
-          let errorMessage = 'Erro ao criar menu';
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch {
-            errorMessage = `Erro ${response.status}: ${response.statusText}`;
-          }
-          throw new Error(errorMessage);
-        }
-
-        const newMenu = await response.json();
-        setCurrentMenu(newMenu);
-        setMenuCreated(true);
-        await showSuccess('Menu criado com sucesso');
-        await fetchMenuItems();
-      } else {
-        const response = await fetch(`/api/menus/${currentMenu.uuid}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: menuName.trim(),
-            location: menuLocation || null,
-          }),
-        });
-
-        if (!response.ok) throw new Error('Erro ao salvar menu');
-
-        const updatedMenu = await response.json();
-        setCurrentMenu(updatedMenu);
-        await showSuccess('Menu salvo com sucesso');
-        onSave();
-      }
-    } catch (error: any) {
-      console.error('Erro ao salvar menu:', error);
-      await showError(error.message || 'Erro ao salvar menu');
-    } finally {
-      setSaving(false);
-    }
-  };
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-        <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">Configurações do Menu</h2>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="menu-name">Nome do menu</Label>
-            <Input
-              id="menu-name"
-              value={menuName}
-              onChange={(e) => setMenuName(e.target.value)}
-              placeholder="Menu Principal"
-              disabled={saving}
-            />
+    <FormikProvider value={formik}>
+      <div className="space-y-6">
+        <form onSubmit={formik.handleSubmit}>
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">Configurações do Menu</h2>
+            <div className="space-y-4">
+              <FormInput
+                name="name"
+                label="Nome do menu"
+                required
+                placeholder="Menu Principal"
+                disabled={formik.isSubmitting}
+              />
+              <FormSelect
+                name="location"
+                label="Local de exibição"
+                disabled={formik.isSubmitting}
+              >
+                <option value="header">Header Menu</option>
+                <option value="footer">Footer Menu</option>
+              </FormSelect>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="menu-location">Local de exibição</Label>
-            <select
-              id="menu-location"
-              value={menuLocation}
-              onChange={(e) => setMenuLocation(e.target.value)}
-              disabled={saving}
-              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className={menuCreated && currentMenu ? '' : 'opacity-50 pointer-events-none'}>
+            <AddMenuItemsPanel onAddItems={handleAddItems} />
+          </div>
+          <div className={`rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900 ${menuCreated && currentMenu ? '' : 'opacity-50'}`}>
+            <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">Estrutura do menu</h3>
+            <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+              Arraste os itens para colocá-los na ordem desejada. Clique na seta à direita do item
+              para mostrar opções de configuração adicionais.
+            </p>
+
+            {!menuCreated || !currentMenu ? (
+              <div className="py-8 text-center text-sm text-zinc-500">
+                Salve o menu para começar a adicionar páginas.
+              </div>
+            ) : loading ? (
+              <div className="py-8 text-center text-sm text-zinc-500">Carregando itens...</div>
+            ) : items.length === 0 ? (
+              <div className="py-8 text-center text-sm text-zinc-500">
+                Nenhum item no menu. Adicione páginas usando o painel à esquerda.
+              </div>
+            ) : (
+              <MenuItemsList
+                items={items}
+                flatItems={flatItems}
+                onUpdate={handleUpdateItem}
+                onMove={handleMoveItem}
+                onRemove={handleRemoveItem}
+                onReorder={handleReorder}
+              />
+            )}
+          </div>
+        </div>
+
+          <div className="flex justify-between">
+            <Button
+              type="submit"
+              disabled={formik.isSubmitting}
             >
-              <option value="header">Header Menu</option>
-              <option value="footer">Footer Menu</option>
-            </select>
+              {formik.isSubmitting ? (
+                <>
+                  <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  {currentMenu ? 'Salvando...' : 'Criando...'}
+                </>
+              ) : (
+                currentMenu ? 'Salvar menu' : 'Criar menu'
+              )}
+            </Button>
           </div>
-        </div>
+        </form>
       </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className={menuCreated && currentMenu ? '' : 'opacity-50 pointer-events-none'}>
-          <AddMenuItemsPanel onAddItems={handleAddItems} />
-        </div>
-        <div className={`rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900 ${menuCreated && currentMenu ? '' : 'opacity-50'}`}>
-          <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">Estrutura do menu</h3>
-          <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-            Arraste os itens para colocá-los na ordem desejada. Clique na seta à direita do item
-            para mostrar opções de configuração adicionais.
-          </p>
-
-          {!menuCreated || !currentMenu ? (
-            <div className="py-8 text-center text-sm text-zinc-500">
-              Salve o menu para começar a adicionar páginas.
-            </div>
-          ) : loading ? (
-            <div className="py-8 text-center text-sm text-zinc-500">Carregando itens...</div>
-          ) : items.length === 0 ? (
-            <div className="py-8 text-center text-sm text-zinc-500">
-              Nenhum item no menu. Adicione páginas usando o painel à esquerda.
-            </div>
-          ) : (
-            <MenuItemsList
-              items={items}
-              flatItems={flatItems}
-              onUpdate={handleUpdateItem}
-              onMove={handleMoveItem}
-              onRemove={handleRemoveItem}
-              onReorder={handleReorder}
-            />
-          )}
-        </div>
-      </div>
-
-      <div className="flex justify-between">
-        <Button
-          onClick={handleSaveMenu}
-          disabled={saving}
-        >
-          {saving
-            ? currentMenu
-              ? 'Salvando...'
-              : 'Criando...'
-            : currentMenu
-              ? 'Salvar menu'
-              : 'Criar menu'}
-        </Button>
-      </div>
-    </div>
+    </FormikProvider>
   );
 }
 

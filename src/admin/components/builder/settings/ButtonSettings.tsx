@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import { FormikProvider, useFormik } from 'formik';
+import React, { useEffect } from 'react';
 
-import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
+import { FormInput } from '@/components/ui/FormInput';
+import { FormSelect } from '@/components/ui/FormSelect';
+import { buttonBlockSchema } from '@/core/validations';
 
 import type { ButtonBlock } from '../types';
 
@@ -14,43 +15,52 @@ interface ButtonSettingsProps {
 }
 
 export function ButtonSettings({ block, onChange }: ButtonSettingsProps) {
+  const formik = useFormik<ButtonBlock>({
+    initialValues: block,
+    validationSchema: buttonBlockSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      onChange(values);
+    },
+  });
+
+  useEffect(() => {
+    const hasChanges = 
+      formik.values.text !== block.text ||
+      formik.values.url !== block.url ||
+      formik.values.variant !== block.variant;
+    
+    if (hasChanges) {
+      onChange(formik.values);
+    }
+     
+  }, [formik.values.text, formik.values.url, formik.values.variant]);
+
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="button-text">Texto do Botão</Label>
-        <Input
-          id="button-text"
-          value={block.text}
-          onChange={(e) => onChange({ ...block, text: e.target.value })}
+    <FormikProvider value={formik}>
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
+        <FormInput
+          name="text"
+          label="Texto do Botão"
+          required
           placeholder="Clique aqui"
         />
-      </div>
-      <div>
-        <Label htmlFor="button-url">URL</Label>
-        <Input
-          id="button-url"
-          value={block.url}
-          onChange={(e) => onChange({ ...block, url: e.target.value })}
+        <FormInput
+          name="url"
+          label="URL"
+          required
           placeholder="https://..."
         />
-      </div>
-      <div>
-        <Label htmlFor="button-variant">Variante</Label>
-        <Select
-          id="button-variant"
-          value={block.variant || 'primary'}
-          onChange={(e) =>
-            onChange({
-              ...block,
-              variant: e.target.value as 'primary' | 'secondary',
-            })
-          }
+        <FormSelect
+          name="variant"
+          label="Variante"
+          required
         >
           <option value="primary">Primário</option>
           <option value="secondary">Secundário</option>
-        </Select>
-      </div>
-    </div>
+        </FormSelect>
+      </form>
+    </FormikProvider>
   );
 }
 

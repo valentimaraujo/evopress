@@ -14,9 +14,10 @@ export async function GET() {
       themes,
       activeTheme,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro ao listar temas';
     return formatJSONResponse(
-      { error: error.message || 'Erro ao listar temas' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -71,9 +72,10 @@ export async function POST(request: NextRequest) {
       message: 'Tema ativado com sucesso',
       activeTheme: themeName,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro ao ativar tema';
     return formatJSONResponse(
-      { error: error.message || 'Erro ao ativar tema' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

@@ -95,15 +95,20 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
     }
   };
 
+  const [adding, setAdding] = useState(false);
+
   const handleAddToMenu = async () => {
     if (selectedPages.size === 0) return;
 
+    setAdding(true);
     try {
       await onAddItems(Array.from(selectedPages));
       setSelectedPages(new Set());
       await showSuccess('Páginas adicionadas ao menu');
     } catch (error) {
       console.error('Erro ao adicionar páginas:', error);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -124,6 +129,7 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
       <div className="mb-4">
         <div className="flex border-b border-zinc-200 dark:border-zinc-700">
           <button
+            type="button"
             onClick={() => setActiveTab('recent')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === 'recent'
@@ -134,6 +140,7 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
             Mais recentes
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('all')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === 'all'
@@ -144,6 +151,7 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
             Ver tudo
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('search')}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === 'search'
@@ -200,6 +208,7 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
 
         {hasMore && pages.length > 0 && (
           <button
+            type="button"
             onClick={handleLoadMore}
             disabled={loading}
             className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
@@ -221,11 +230,19 @@ export function AddMenuItemsPanel({ onAddItems }: AddMenuItemsPanelProps) {
             <span className="text-sm text-zinc-700 dark:text-zinc-300">Selecionar todos</span>
           </label>
           <Button
+            type="button"
             onClick={handleAddToMenu}
-            disabled={selectedPages.size === 0}
+            disabled={selectedPages.size === 0 || adding}
             className="w-full"
           >
-            Adicionar ao menu
+            {adding ? (
+              <>
+                <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                Adicionando...
+              </>
+            ) : (
+              'Adicionar ao menu'
+            )}
           </Button>
         </div>
       )}

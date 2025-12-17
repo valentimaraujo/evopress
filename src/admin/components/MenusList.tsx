@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
@@ -50,8 +50,9 @@ export function MenusList() {
 
       await showSuccess('Menu excluído com sucesso');
       fetchMenus();
-    } catch (error: any) {
-      await showError(error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir menu';
+      await showError(errorMessage);
     } finally {
       setDeletingMenuId(null);
     }
@@ -103,23 +104,23 @@ export function MenusList() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => router.push(`/admin/menus/${menu.uuid}`)}
-                    className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-indigo-600 dark:hover:bg-zinc-700 dark:hover:text-indigo-400"
+                    className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400"
                     title="Editar menu"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(menu)}
                     disabled={deletingMenuId === menu.uuid}
-                    className={`rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 
-                      dark:hover:bg-red-900/20 dark:hover:text-red-400 ${
-                      deletingMenuId === menu.uuid
-                        ? 'opacity-50 cursor-not-allowed'
-                        : ''
-                    }`}
+                    className="rounded-lg p-2 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Excluir menu"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    {deletingMenuId === menu.uuid ? (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></span>
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>

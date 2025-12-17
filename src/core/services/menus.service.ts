@@ -196,7 +196,7 @@ export async function createMenu(params: CreateMenuParams): Promise<Menu> {
     }
 
     return menu;
-  } catch (error: any) {
+  } catch (error: unknown) {
     throw error;
   }
 }

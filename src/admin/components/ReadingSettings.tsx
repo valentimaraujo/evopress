@@ -1,38 +1,75 @@
 'use client';
 
+import { FormikProvider, useFormik } from 'formik';
 import React, { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/Button';
-import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
+import { FormRadioGroup } from '@/components/ui/FormRadioGroup';
+import { FormSelect } from '@/components/ui/FormSelect';
 import type { Post } from '@/core/services/posts.service';
-import type { ReadingSettings } from '@/core/services/settings.service';
 import { showError, showSuccess } from '@/core/utils/swal';
+import { readingSettingsSchema, type ReadingSettingsFormValues } from '@/core/validations';
 
 export function ReadingSettings() {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [settings, setSettings] = useState<ReadingSettings>({
-    homepageType: 'posts',
-    homepagePage: null,
-    postsPage: null,
-  });
   const [pages, setPages] = useState<Post[]>([]);
+
+  const formik = useFormik<ReadingSettingsFormValues>({
+    initialValues: {
+      homepageType: 'posts',
+      homepagePage: null,
+      postsPage: null,
+    },
+    validationSchema: readingSettingsSchema,
+    enableReinitialize: true,
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        const response = await fetch('/api/settings/reading', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao salvar configurações');
+        }
+
+        await showSuccess('Configurações salvas com sucesso');
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao salvar configurações';
+        await showError(errorMessage);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   useEffect(() => {
     fetchSettings();
     fetchPages();
+     
   }, []);
 
   const fetchSettings = async () => {
     try {
       const response = await fetch('/api/settings/reading');
-      if (!response.ok) throw new Error('Erro ao buscar configurações');
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Erro desconhecido' }));
+        throw new Error(errorData.error || `Erro ${response.status}: ${response.statusText}`);
+      }
 
       const data = await response.json();
-      setSettings(data);
-    } catch (error) {
+      formik.setValues({
+        homepageType: data.homepageType || 'posts',
+        homepagePage: data.homepagePage || null,
+        postsPage: data.postsPage || null,
+      });
+    } catch (error: unknown) {
       console.error('Erro ao buscar configurações:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao carregar configurações. Tente recarregar a página.';
+      await showError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -50,102 +87,43 @@ export function ReadingSettings() {
     }
   };
 
-  const handleSave = async () => {
-    if (settings.homepageType === 'page' && !settings.homepagePage) {
-      await showError('Selecione uma página inicial');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const response = await fetch('/api/settings/reading', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao salvar configurações');
-      }
-
-      await showSuccess('Configurações salvas com sucesso');
-    } catch (error: any) {
-      await showError(error.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   if (loading) {
     return <div className="text-center text-zinc-500">Carregando configurações...</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-        <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-white">
-          Sua página inicial exibe
-        </h2>
-
-        <div className="space-y-4">
-          <label className="flex cursor-pointer items-start gap-3">
-            <input
-              type="radio"
-              name="homepageType"
-              value="posts"
-              checked={settings.homepageType === 'posts'}
-              onChange={(e) =>
-                setSettings({ ...settings, homepageType: e.target.value as 'posts' | 'page' })
-              }
-              className="mt-1 h-4 w-4 border-zinc-300 text-indigo-600 focus:ring-indigo-500"
-            />
-            <div className="flex-1">
-              <div className="font-medium text-zinc-900 dark:text-white">
-                Seus posts mais recentes
-              </div>
-              <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                Exibe os posts mais recentes na página inicial do site.
-              </div>
-            </div>
-          </label>
-
-          <label className="flex cursor-pointer items-start gap-3">
-            <input
-              type="radio"
-              name="homepageType"
-              value="page"
-              checked={settings.homepageType === 'page'}
-              onChange={(e) =>
-                setSettings({ ...settings, homepageType: e.target.value as 'posts' | 'page' })
-              }
-              className="mt-1 h-4 w-4 border-zinc-300 text-indigo-600 focus:ring-indigo-500"
-            />
-            <div className="flex-1">
-              <div className="font-medium text-zinc-900 dark:text-white">Uma página estática</div>
-              <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                Selecione uma página para ser exibida como página inicial.
-              </div>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      {settings.homepageType === 'page' && (
+    <FormikProvider value={formik}>
+      <form onSubmit={formik.handleSubmit} className="space-y-6">
         <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-          <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
-            Configurações de Página Estática
-          </h3>
+          <FormRadioGroup
+            name="homepageType"
+            label="Sua página inicial exibe"
+            options={[
+              {
+                value: 'posts',
+                label: 'Seus posts mais recentes',
+                description: 'Exibe os posts mais recentes na página inicial do site.',
+              },
+              {
+                value: 'page',
+                label: 'Uma página estática',
+                description: 'Selecione uma página para ser exibida como página inicial.',
+              },
+            ]}
+          />
+        </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="homepagePage">Página inicial</Label>
-              <Select
-                id="homepagePage"
-                value={settings.homepagePage || ''}
-                onChange={(e) =>
-                  setSettings({ ...settings, homepagePage: e.target.value || null })
-                }
+        {formik.values.homepageType === 'page' && (
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            <h3 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-white">
+              Configurações de Página Estática
+            </h3>
+
+            <div className="space-y-4">
+              <FormSelect
+                name="homepagePage"
+                label="Página inicial"
+                required
                 className="mt-2"
               >
                 <option value="">— Selecione —</option>
@@ -154,17 +132,11 @@ export function ReadingSettings() {
                     {page.title}
                   </option>
                 ))}
-              </Select>
-            </div>
+              </FormSelect>
 
-            <div>
-              <Label htmlFor="postsPage">Página de posts</Label>
-              <Select
-                id="postsPage"
-                value={settings.postsPage || ''}
-                onChange={(e) =>
-                  setSettings({ ...settings, postsPage: e.target.value || null })
-                }
+              <FormSelect
+                name="postsPage"
+                label="Página de posts"
                 className="mt-2"
               >
                 <option value="">— Selecione —</option>
@@ -173,21 +145,28 @@ export function ReadingSettings() {
                     {page.title}
                   </option>
                 ))}
-              </Select>
+              </FormSelect>
               <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                 Opcional. Selecione uma página onde os posts serão exibidos.
               </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? 'Salvando...' : 'Salvar alterações'}
-        </Button>
-      </div>
-    </div>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={formik.isSubmitting}>
+            {formik.isSubmitting ? (
+              <>
+                <span className="mr-2 inline-block h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                Salvando...
+              </>
+            ) : (
+              'Salvar alterações'
+            )}
+          </Button>
+        </div>
+      </form>
+    </FormikProvider>
   );
 }
 

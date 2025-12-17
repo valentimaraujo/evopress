@@ -2,8 +2,14 @@ import { getActiveTheme } from '@/core/services/themes.service';
 
 const DEFAULT_THEME = 'base';
 
+interface ThemeModule {
+  Layout?: React.ComponentType<any>;
+  default?: React.ComponentType<any>;
+  [key: string]: unknown;
+}
+
 interface ComponentCache {
-  [key: string]: any;
+  [key: string]: ThemeModule;
 }
 
 const componentCache: ComponentCache = {};
@@ -11,7 +17,7 @@ const componentCache: ComponentCache = {};
 export async function loadThemeComponent(
   componentName: string,
   themeName?: string
-): Promise<any> {
+): Promise<ThemeModule> {
   const activeTheme = themeName || (await getActiveTheme());
   const cacheKey = `${activeTheme}:${componentName}`;
 
@@ -39,9 +45,4 @@ export async function loadThemeComponent(
   }
 }
 
-export function clearThemeCache(): void {
-  Object.keys(componentCache).forEach((key) => {
-    delete componentCache[key];
-  });
-}
 

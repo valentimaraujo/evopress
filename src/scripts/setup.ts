@@ -12,11 +12,11 @@ import { users, settings } from '../db/schema';
 config({ path: '.env.local' });
 
 async function main() {
-  console.log('\n🚀 Iniciando EvoPress Setup Simplificado...\n');
+  console.log('\nIniciando EvoPress Setup Simplificado...\n');
 
   // Validação básica
   if (!process.env.DATABASE_URL) {
-    console.error('❌ Erro: DATABASE_URL não encontrada no .env.local');
+    console.error('Erro: DATABASE_URL não encontrada no .env.local');
     process.exit(1);
   }
 
@@ -29,7 +29,7 @@ async function main() {
     // - users, posts, media (tabelas base)
     // - menus, menu_items (sistema de menus)
     // - settings (configurações do sistema)
-    console.log('📦 Criando/Atualizando tabelas no banco...');
+    console.log('Criando/Atualizando tabelas no banco...');
     console.log('   Tabelas a serem criadas/atualizadas:');
     console.log('   - evopress_users');
     console.log('   - evopress_posts');
@@ -39,10 +39,11 @@ async function main() {
     console.log('   - evopress_settings (nova)');
     try {
       execSync('npx drizzle-kit push', { stdio: 'inherit' });
-      console.log('✅ Tabelas sincronizadas com sucesso.');
-    } catch (error: any) {
-      console.error('❌ Falha ao sincronizar tabelas via drizzle-kit.');
-      console.error('   Erro:', error.message || 'Erro desconhecido');
+      console.log('Tabelas sincronizadas com sucesso.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      console.error('Falha ao sincronizar tabelas via drizzle-kit.');
+      console.error('   Erro:', errorMessage);
       console.error('   Verifique se o DATABASE_URL está correto no .env.local');
       console.error('   Se as dependências já estão instaladas, tente: npm run setup:skip-install');
       process.exit(1);
@@ -55,7 +56,7 @@ async function main() {
     try {
       // 4. Criar Índices de Performance (GIN)
       // Índices GIN são otimizados para busca em campos JSONB
-      console.log('⚡ Otimizando banco de dados (Índices GIN)...');
+      console.log('Otimizando banco de dados (Índices GIN)...');
       
       const indexes = [
         // Índices para campos JSONB
@@ -72,10 +73,10 @@ async function main() {
           // Ignorar erro se índice já existe ou não suportado (não deve bloquear setup)
         }
       }
-      console.log('✅ Índices configurados.');
+      console.log('Índices configurados.');
 
       // 5. Criar Usuário Admin (Seed)
-      console.log('👤 Verificando usuário administrador...');
+      console.log('Verificando usuário administrador...');
       
       // Verifica se existe QUALQUER usuário (não apenas admin)
       // Precisamos usar sql raw ou arriscar que o schema do drizzle use o nome da tabela errado
@@ -86,7 +87,7 @@ async function main() {
       const existingUsers = await db.select().from(users).limit(1);
       
       if (existingUsers.length > 0) {
-        console.log('ℹ️  Usuários já existem no banco. Setup de admin pulado.');
+        console.log('Usuários já existem no banco. Setup de admin pulado.');
       } else {
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@evopress.local';
         const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
@@ -102,13 +103,13 @@ async function main() {
           metaData: { bio: 'Super Admin do Sistema' },
         });
 
-        console.log('\n✅ ADMIN CRIADO COM SUCESSO!');
+        console.log('\nADMIN CRIADO COM SUCESSO!');
         console.log(`   Email: ${adminEmail}`);
         console.log('   (Altere a senha após o primeiro login!)');
       }
 
       // 6. Inicializar Tema Ativo
-      console.log('🎨 Verificando tema ativo...');
+      console.log('Verificando tema ativo...');
       const existingTheme = await db
         .select()
         .from(settings)
@@ -120,19 +121,19 @@ async function main() {
           key: 'active_theme',
           value: 'base',
         });
-        console.log('✅ Tema ativo inicializado: base');
+        console.log('Tema ativo inicializado: base');
       } else {
-        console.log('ℹ️  Tema ativo já configurado.');
+        console.log('Tema ativo já configurado.');
       }
 
     } finally {
       await pool.end();
     }
 
-    console.log('\n🎉 Setup concluído com sucesso! Você pode rodar "npm run dev" agora.\n');
+    console.log('\nSetup concluído com sucesso! Você pode rodar "npm run dev" agora.\n');
 
   } catch (error) {
-    console.error('\n❌ Erro fatal durante o setup:', error);
+    console.error('\nErro fatal durante o setup:', error);
     process.exit(1);
   }
 }
