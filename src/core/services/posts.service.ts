@@ -1,10 +1,10 @@
-import { eq, and, or, ilike, desc, count, isNull } from 'drizzle-orm';
+import { eq, and, or, ilike, desc, count, isNull, ne } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { posts, users } from '@/db/schema';
 
 export type PostStatus = 'draft' | 'published' | 'archived';
-export type PostType = 'post' | 'page' | 'custom';
+export type PostType = 'post' | 'page';
 
 export interface PostListItem {
   uuid: string;
@@ -342,5 +342,208 @@ export async function deletePost(uuid: string, authorUuid: string): Promise<{ su
     .where(eq(posts.uuid, uuid));
 
   return { success: true };
+}
+
+export async function getPostBySlug(slug: string, postType: PostType): Promise<Post | null> {
+  const [post] = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.slug, slug),
+        eq(posts.postType, postType),
+        eq(posts.status, 'published'),
+        isNull(posts.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!post) {
+    return null;
+  }
+
+  return {
+    uuid: post.uuid,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    status: post.status as PostStatus,
+    postType: post.postType as PostType,
+    authorUuid: post.authorUuid,
+    contentBlocks: (post.contentBlocks as unknown[]) || [],
+    metaData: (post.metaData as Record<string, unknown>) || null,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    seoKeywords: post.seoKeywords,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    publishedAt: post.publishedAt,
+  };
+}
+
+export async function getPostBySlugForPreview(
+  slug: string,
+  postType: PostType,
+  authorUuid: string
+): Promise<Post | null> {
+  const [post] = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.slug, slug),
+        eq(posts.postType, postType),
+        eq(posts.authorUuid, authorUuid),
+        isNull(posts.deletedAt)
+      )
+    )
+    .limit(1);
+
+  if (!post) {
+    return null;
+  }
+
+  return {
+    uuid: post.uuid,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    status: post.status as PostStatus,
+    postType: post.postType as PostType,
+    authorUuid: post.authorUuid,
+    contentBlocks: (post.contentBlocks as unknown[]) || [],
+    metaData: (post.metaData as Record<string, unknown>) || null,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    seoKeywords: post.seoKeywords,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    publishedAt: post.publishedAt,
+  };
+}
+
+export async function getRecentPosts(limit: number = 5, excludeUuid?: string): Promise<PostListItem[]> {
+  const conditions = [
+    isNull(posts.deletedAt),
+    eq(posts.status, 'published'),
+    eq(posts.postType, 'post'),
+  ];
+
+  if (excludeUuid) {
+    conditions.push(ne(posts.uuid, excludeUuid));
+  }
+
+  const whereClause = and(...conditions);
+
+  const postsList = await db
+    .select({
+      uuid: posts.uuid,
+      title: posts.title,
+      slug: posts.slug,
+      excerpt: posts.excerpt,
+      status: posts.status,
+      postType: posts.postType,
+      authorUuid: posts.authorUuid,
+      authorName: users.name,
+      authorEmail: users.email,
+      seoTitle: posts.seoTitle,
+      seoDescription: posts.seoDescription,
+      seoKeywords: posts.seoKeywords,
+      createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt,
+      publishedAt: posts.publishedAt,
+      contentBlocks: posts.contentBlocks,
+    })
+    .from(posts)
+    .innerJoin(users, eq(posts.authorUuid, users.uuid))
+    .where(whereClause)
+    .orderBy(desc(posts.publishedAt))
+    .limit(limit);
+
+  return postsList.map((post) => ({
+    uuid: post.uuid,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt,
+    status: post.status as PostStatus,
+    postType: post.postType as PostType,
+    authorUuid: post.authorUuid,
+    authorName: post.authorName,
+    authorEmail: post.authorEmail,
+    seoTitle: post.seoTitle,
+    seoDescription: post.seoDescription,
+    seoKeywords: post.seoKeywords,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    publishedAt: post.publishedAt,
+    contentBlocksCount: Array.isArray(post.contentBlocks) ? post.contentBlocks.length : 0,
+  }));
+}
+
+export async function getHomepage(): Promise<Post | null> {
+  const allPages = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.postType, 'page'),
+        eq(posts.status, 'published'),
+        isNull(posts.deletedAt)
+      )
+    );
+
+  for (const page of allPages) {
+    const metaData = page.metaData as Record<string, unknown> | null;
+    if (metaData && metaData.isHomepage === true) {
+      return page as Post;
+    }
+  }
+
+  return null;
+}
+
+export async function setHomepage(pageUuid: string): Promise<Post | null> {
+  const page = await getPost(pageUuid);
+  if (!page || page.postType !== 'page') {
+    return null;
+  }
+
+  const allPages = await db
+    .select()
+    .from(posts)
+    .where(
+      and(
+        eq(posts.postType, 'page'),
+        isNull(posts.deletedAt)
+      )
+    );
+
+  const now = new Date();
+
+  for (const p of allPages) {
+    const metaData = (p.metaData as Record<string, unknown>) || {};
+    if (p.uuid === pageUuid) {
+      metaData.isHomepage = true;
+      await db
+        .update(posts)
+        .set({
+          metaData,
+          updatedAt: now,
+        })
+        .where(eq(posts.uuid, p.uuid));
+    } else if (metaData.isHomepage === true) {
+      metaData.isHomepage = false;
+      await db
+        .update(posts)
+        .set({
+          metaData,
+          updatedAt: now,
+        })
+        .where(eq(posts.uuid, p.uuid));
+    }
+  }
+
+  const updatedPage = await getPost(pageUuid);
+  return updatedPage;
 }
 
