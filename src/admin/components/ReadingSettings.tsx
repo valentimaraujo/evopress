@@ -68,7 +68,8 @@ export function ReadingSettings() {
       });
     } catch (error: unknown) {
       console.error('Erro ao buscar configurações:', error);
-      await showError(error.message || 'Erro ao carregar configurações. Tente recarregar a página.');
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao carregar configurações. Tente recarregar a página.';
+      await showError(errorMessage);
     } finally {
       setLoading(false);
     }
