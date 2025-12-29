@@ -10,57 +10,53 @@ interface PostContentProps {
 }
 
 export function PostContent({ post }: PostContentProps) {
+    const featuredImage = post.metaData?.featuredImage as string | undefined;
+
     return (
-        <article className="mx-auto max-w-4xl py-12 px-4 sm:px-6 lg:px-8">
-            {/* Header */}
-            <header className="mb-12 text-center">
-                <div className="mb-4 flex items-center justify-center space-x-2 text-sm font-bold uppercase tracking-widest text-primary">
-                    <span>Blog</span>
-                    <span className="h-1 w-1 rounded-full bg-primary/30" />
-                    <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                </div>
-                <h1 className="mb-6 text-4xl font-black uppercase tracking-tight text-zinc-900 md:text-5xl dark:text-white">
-                    {post.title}
-                </h1>
-                {post.excerpt && (
-                    <p className="mx-auto max-w-2xl text-lg text-zinc-600 dark:text-zinc-400">
-                        {post.excerpt}
-                    </p>
+        <div className="post-content-wrapper">
+            {/* Subheader / Page Title */}
+            <section id="subheader" className="relative jarallax text-light">
+                {featuredImage && (
+                    <img src={featuredImage} className="jarallax-img" alt={post.title} />
                 )}
-            </header>
-
-            {/* Featured Image Placeholder or actual if available */}
-            {/* (In EvoPress, images would be blocks, but we can have a featured image in metadata) */}
-
-            {/* Content Blocks */}
-            <div className="prose prose-zinc prose-lg mx-auto dark:prose-invert prose-headings:uppercase prose-headings:font-black prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
-                {post.contentBlocks && post.contentBlocks.length > 0 ? (
-                    post.contentBlocks.map((block) => (
-                        <div key={block.id} className="mb-8 last:mb-0">
-                            {renderPublicBlock(block)}
+                <div className="container relative z-index-1000">
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <ul className="crumb">
+                                <li><a href="/">Home</a></li>
+                                <li className="active">Blog</li>
+                            </ul>
+                            <h1 className="text-uppercase">{post.title}</h1>
                         </div>
-                    ))
-                ) : (
-                    <p className="text-center text-zinc-500 italic">Este post ainda não tem conteúdo.</p>
-                )}
-            </div>
-
-            {/* Footer / Tags */}
-            <footer className="mt-16 border-t border-zinc-100 pt-8 dark:border-zinc-800">
-                <div className="flex items-center justify-between">
-                    <Link href="/blog" className="text-sm font-bold uppercase tracking-wide text-zinc-500 hover:text-primary">
-                        ← Voltar para o Blog
-                    </Link>
-                    <div className="flex space-x-2">
-                        {/* Social Share icons could go here */}
                     </div>
                 </div>
-            </footer>
-        </article>
+                <img src="/themes/gardyn/images/logo-wm.webp" className="abs end-0 bottom-0 z-2 w-20" alt="" />
+                <div className="de-gradient-edge-top dark"></div>
+                <div className="de-overlay"></div>
+            </section>
+
+            <section>
+                <div className="container">
+                    <div className="row gx-5">
+                        <div className="col-lg-8">
+                            <div className="blog-read">
+                                <div className="post-text">
+                                    {post.excerpt && (
+                                        <p className="lead">{post.excerpt}</p>
+                                    )}
+                                    {post.contentBlocks && (post.contentBlocks as any[]).map((block) => (
+                                        <div key={block.id}>
+                                            {renderPublicBlock(block)}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     );
 }
 
-// Simple internal Link wrapper if needed, but next/link is usually available
-function Link({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
-    return <a href={href} className={className}>{children}</a>;
-}
+export default PostContent;

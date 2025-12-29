@@ -23,6 +23,7 @@ export interface PostListItem {
   updatedAt: Date;
   publishedAt: Date | null;
   contentBlocksCount: number;
+  metaData?: Record<string, unknown> | null;
 }
 
 export interface ListPostsParams {
@@ -322,7 +323,7 @@ export async function listPosts(params: ListPostsParams = {}): Promise<ListPosts
 
 export async function deletePost(uuid: string, authorUuid: string): Promise<{ success: boolean; error?: string }> {
   const existingPost = await getPost(uuid);
-  
+
   if (!existingPost) {
     return { success: false, error: 'Post não encontrado' };
   }

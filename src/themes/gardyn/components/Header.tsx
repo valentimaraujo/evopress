@@ -7,65 +7,63 @@ import { Menu } from './Menu';
 
 export function Header() {
   return (
-    <header className="relative z-50">
-      {/* Topbar */}
-      <div className="hidden bg-zinc-900 py-2.5 text-sm text-zinc-400 lg:block">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center">
-              <span className="mr-2 text-primary">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </span>
-              Monday - Friday 08.00 - 18.00
-            </div>
-            <div className="flex items-center">
-              <span className="mr-2 text-primary">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </span>
-              100 S Main St, New York, NY
+    <header className="transparent">
+      <div id="topbar">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="d-flex justify-content-between xs-hide">
+                <div className="d-flex">
+                  <div className="topbar-widget me-3"><a href="#"><i className="icofont-clock-time"></i>Monday - Friday 08.00 - 18.00</a></div>
+                  <div className="topbar-widget me-3"><a href="#"><i className="icofont-location-pin"></i>100 S Main St, New York, NY</a></div>
+                  <div className="topbar-widget me-3"><a href="#"><i className="icofont-envelope"></i>contact@gardyn.com</a></div>
+                </div>
+
+                <div className="d-flex">
+                  <div className="social-icons">
+                    <a href="#"><i className="fa-brands fa-facebook fa-lg"></i></a>
+                    <a href="#"><i className="fa-brands fa-x-twitter fa-lg"></i></a>
+                    <a href="#"><i className="fa-brands fa-youtube fa-lg"></i></a>
+                    <a href="#"><i className="fa-brands fa-pinterest fa-lg"></i></a>
+                    <a href="#"><i className="fa-brands fa-instagram fa-lg"></i></a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <a href="#" className="hover:text-white transition-colors">Facebook</a>
-            <a href="#" className="hover:text-white transition-colors">X</a>
-            <a href="#" className="hover:text-white transition-colors">Instagram</a>
-          </div>
+          <div className="clearfix"></div>
         </div>
       </div>
-
-      {/* Main Header */}
-      <div className="border-b border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between">
-            <div className="flex items-center gap-8">
-              <Link href="/" className="flex items-center gap-2">
-                <span className="text-2xl font-black uppercase tracking-tighter text-zinc-900 dark:text-white">
-                  Gardyn<span className="text-primary">.</span>
-                </span>
-              </Link>
-              
-              <nav className="hidden md:flex md:space-x-1">
+      <div className="container">
+        <div className="row">
+          <div className="col-md-12">
+            <div className="de-flex sm-pt10">
+              <div className="de-flex-col">
+                {/* logo begin */}
+                <div id="logo">
+                  <Link href="/">
+                    <img className="logo-main" src="/themes/gardyn/images/logo-white.webp" alt="" />
+                    <img className="logo-mobile" src="/themes/gardyn/images/logo-white.webp" alt="" />
+                  </Link>
+                </div>
+                {/* logo end */}
+              </div>
+              <div className="de-flex-col header-col-mid">
+                {/* mainemenu begin */}
                 <Menu location="header" />
-              </nav>
-            </div>
+                {/* mainmenu end */}
+              </div>
+              <div className="de-flex-col">
+                <div className="menu_side_area">
+                  <Link href="/contact" className="btn-main btn-line">Get In Touch</Link>
+                  <span id="menu-btn"></span>
+                </div>
 
-            <div className="flex items-center gap-4">
-              <Link 
-                href="/contact" 
-                className="hidden rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg lg:block"
-              >
-                Get In Touch
-              </Link>
-              <button className="rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 lg:hidden dark:text-zinc-400 dark:hover:bg-zinc-900">
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-              </button>
+                <div id="btn-extra">
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -73,3 +71,5 @@ export function Header() {
     </header>
   );
 }
+
+export default Header;

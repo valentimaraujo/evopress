@@ -5,87 +5,92 @@ import React from 'react';
 
 export function Footer() {
     return (
-        <footer className="bg-zinc-900 pt-16 pb-8 text-zinc-400">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 gap-12 lg:grid-cols-4">
-                    <div className="col-lg-1">
-                        <Link href="/" className="mb-6 block text-2xl font-black uppercase tracking-tighter text-white">
-                            Gardyn<span className="text-primary">.</span>
-                        </Link>
-                        <p className="mb-6 text-sm leading-relaxed">
-                            Transform your outdoor space with our expert garden services! From design to maintenance,
-                            we create beautiful, thriving gardens tailored to your vision.
-                        </p>
-                        <div className="flex space-x-4">
-                            {/* Social icons could go here */}
-                            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 
-                            text-white transition-colors hover:bg-primary">
-                                F
-                            </a>
-                            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 
-                            text-white transition-colors hover:bg-primary">
-                                X
-                            </a>
-                            <a href="#" className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 
-                            text-white transition-colors hover:bg-primary">
-                                I
-                            </a>
+        <footer className="section-dark">
+            <div className="container relative z-2">
+                <div className="row gx-5">
+                    <div className="col-lg-4 col-sm-6">
+                        <img src="/themes/gardyn/images/logo-white.webp" className="w-150px" alt="" />
+                        <div className="spacer-20"></div>
+                        <p>Transform your outdoor space with our expert garden services! From design to maintenance,
+                            we create beautiful, thriving gardens tailored to your vision. Let us bring your dream
+                            garden to life—professional, reliable, and passionate about nature.</p>
+
+                        <div className="social-icons mb-sm-30">
+                            <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
+                            <a href="#"><i className="fa-brands fa-x-twitter"></i></a>
+                            <a href="#"><i className="fa-brands fa-instagram"></i></a>
+                            <a href="#"><i className="fa-brands fa-youtube"></i></a>
+                            <a href="#"><i className="fa-brands fa-whatsapp"></i></a>
                         </div>
                     </div>
-
-                    <div>
-                        <h5 className="mb-6 font-bold uppercase tracking-wider text-white">Company</h5>
-                        <ul className="space-y-3 text-sm">
-                            <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
-                            <li><Link href="/services" className="hover:text-primary transition-colors">Our Services</Link></li>
-                            <li><Link href="/projects" className="hover:text-primary transition-colors">Projects</Link></li>
-                            <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 className="mb-6 font-bold uppercase tracking-wider text-white">Our Services</h5>
-                        <ul className="space-y-3 text-sm">
-                            <li><a href="#" className="hover:text-primary transition-colors">Garden Design</a></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Garden Maintenance</a></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Planting Services</a></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Tree Care</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 className="mb-6 font-bold uppercase tracking-wider text-white">Contact Us</h5>
-                        <div className="space-y-4 text-sm">
-                            <div className="flex items-start gap-3">
-                                <span className="text-primary mt-1">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </span>
-                                <div>
-                                    <div className="font-semibold text-white">We're Open</div>
-                                    Monday - Friday 08.00 - 18.00
+                    <div className="col-lg-4 col-sm-12 order-lg-1 order-sm-2">
+                        <div className="row">
+                            <div className="col-lg-6 col-sm-6">
+                                <div className="widget">
+                                    <h5>Company</h5>
+                                    <ul>
+                                        <li><Link href="/">Home</Link></li>
+                                        <li><Link href="/services">Our Services</Link></li>
+                                        <li><Link href="/projects">Projects</Link></li>
+                                        <li><Link href="/about">About Us</Link></li>
+                                        <li><Link href="/blog">Blog</Link></li>
+                                        <li><Link href="/contact">Contact</Link></li>
+                                    </ul>
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3">
-                                <span className="text-primary mt-1">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    </svg>
-                                </span>
-                                <div>
-                                    <div className="font-semibold text-white">Location</div>
-                                    100 S Main St, New York, NY
+                            <div className="col-lg-6 col-sm-6">
+                                <div className="widget">
+                                    <h5>Our Services</h5>
+                                    <ul>
+                                        <li><Link href="/service-single">Garden Design</Link></li>
+                                        <li><Link href="/service-single">Garden Maintenance</Link></li>
+                                        <li><Link href="/service-single">Planting Services</Link></li>
+                                        <li><Link href="/service-single">Tree Care</Link></li>
+                                        <li><Link href="/service-single">Irrigation Services</Link></li>
+                                        <li><Link href="/service-single">Specialty Services</Link></li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div className="col-lg-4 col-sm-6 order-lg-2 order-sm-1">
+                        <div className="widget">
+                            <div className="fw-bold text-white"><i className="icofont-clock-time me-2 id-color-2"></i>We're Open</div>
+                            Monday - Friday 08.00 - 18.00
 
-                <div className="mt-16 border-t border-zinc-800 pt-8 text-center text-xs">
-                    <p>© 2025 Gardyn by EvoDev. All rights reserved.</p>
+                            <div className="spacer-20"></div>
+
+                            <div className="fw-bold text-white"><i className="icofont-location-pin me-2 id-color-2"></i>Office Location</div>
+                            100 S Main St, New York, NY
+
+                            <div className="spacer-20"></div>
+
+                            <div className="fw-bold text-white"><i className="icofont-envelope me-2 id-color-2"></i>Send a Message</div>
+                            contact@gardyn.com
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div className="subfooter">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="de-flex">
+                                <div className="de-flex-col">
+                                    Copyright 2024 - Gardyn by Designesia
+                                </div>
+                                <ul className="menu-simple">
+                                    <li><Link href="#">Terms &amp; Conditions</Link></li>
+                                    <li><Link href="#">Privacy Policy</Link></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="/themes/gardyn/images/misc/silhuette-1-black.webp" className="abs bottom-0 op-3" alt="" />
         </footer>
     );
 }
+
+export default Footer;
