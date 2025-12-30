@@ -1,0 +1,285 @@
+/* Gardyn Theme - Footer Styles
+ * Extracted from style.css
+ */
+
+footer {
+    padding: 80px 0 0;
+    background: var(--bg-dark-1, #1a1a1a);
+    color: rgba(255, 255, 255, 0.7);
+    position: relative;
+}
+
+footer.section-dark {
+    background: var(--bg-dark-1, #1a1a1a);
+}
+
+footer.footer-light {
+    background: #f8f9fa;
+    color: #333;
+}
+
+footer h5 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+footer.footer-light h5 {
+    color: #333;
+}
+
+footer p {
+    line-height: 1.8em;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+footer a {
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: var(--primary-color, #fa6a2e);
+}
+
+footer.footer-light a {
+    color: #666;
+}
+
+footer.footer-light a:hover {
+    color: var(--primary-color, #fa6a2e);
+}
+
+/* Footer Widgets */
+footer .widget {
+    margin-bottom: 40px;
+}
+
+footer .widget ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+footer .widget ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+}
+
+footer.footer-light .widget ul li {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+footer .widget ul li:last-child {
+    border-bottom: none;
+}
+
+footer .widget ul li a {
+    display: block;
+    padding-left: 0;
+    transition: all 0.3s;
+}
+
+footer .widget ul li a:hover {
+    padding-left: 10px;
+}
+
+/* Contact Info Widget */
+footer .widget .fw-bold {
+    display: block;
+    margin-bottom: 8px;
+    margin-top: 20px;
+}
+
+footer .widget .fw-bold:first-child {
+    margin-top: 0;
+}
+
+footer .widget .fw-bold i {
+    margin-right: 8px;
+}
+
+/* Social Icons */
+.social-icons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+}
+
+.social-icons a:hover {
+    background: var(--primary-color, #fa6a2e);
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+footer.footer-light .social-icons a {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+footer.footer-light .social-icons a:hover {
+    background: var(--primary-color, #fa6a2e);
+    color: #fff;
+}
+
+.social-icons i {
+    font-size: 16px;
+}
+
+.mb-sm-30 {
+    margin-bottom: 30px;
+}
+
+/* Subfooter */
+.subfooter {
+    padding: 30px 0;
+    margin-top: 60px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+}
+
+footer.footer-light .subfooter {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.menu-simple {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.menu-simple li a {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.menu-simple li a:hover {
+    color: var(--primary-color, #fa6a2e);
+}
+
+footer.footer-light .menu-simple li a {
+    color: #666;
+}
+
+/* Utility Classes */
+.w-150px {
+    width: 150px;
+}
+
+.spacer-20 {
+    height: 20px;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+.fw-bold {
+    font-weight: 600;
+}
+
+.me-2 {
+    margin-right: 8px;
+}
+
+/* Absolute positioned elements */
+.abs {
+    position: absolute;
+}
+
+.bottom-0 {
+    bottom: 0;
+}
+
+.op-3 {
+    opacity: 0.3;
+}
+
+/* Grid spacing */
+.gx-5 {
+    --bs-gutter-x: 3rem;
+}
+
+.relative {
+    position: relative;
+}
+
+.z-2 {
+    z-index: 2;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    footer {
+        padding: 60px 0 0;
+    }
+
+    .subfooter {
+        margin-top: 40px;
+    }
+
+    .subfooter .de-flex {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .menu-simple {
+        justify-content: center;
+    }
+
+    .order-lg-1 {
+        order: 1;
+    }
+
+    .order-lg-2 {
+        order: 2;
+    }
+
+    .order-sm-1 {
+        order: 1;
+    }
+
+    .order-sm-2 {
+        order: 2;
+    }
+}
+
+@media (max-width: 767px) {
+    footer {
+        padding: 40px 0 0;
+    }
+
+    footer h5 {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .subfooter {
+        padding: 20px 0;
+        margin-top: 30px;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+}

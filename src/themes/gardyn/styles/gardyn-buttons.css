@@ -1,0 +1,153 @@
+/* Gardyn Theme - Button Styles
+ * Extracted from style.css
+ */
+
+.btn-main {
+    display: inline-block;
+    padding: 12px 30px;
+    background: var(--primary-color, #fa6a2e);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.5;
+}
+
+.btn-main:hover {
+    background: var(--secondary-color, #8bc34a);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-main.bg-color-2 {
+    background: var(--secondary-color, #8bc34a);
+}
+
+.btn-main.bg-color-2:hover {
+    background: var(--primary-color, #fa6a2e);
+}
+
+/* Line Button */
+.btn-line {
+    display: inline-block;
+    padding: 12px 30px;
+    background: transparent;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    transition: all 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.5;
+}
+
+.btn-line:hover,
+a.btn-line:hover {
+    background: var(--primary-color, #fa6a2e);
+    border-color: var(--primary-color, #fa6a2e);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-line.hover,
+a.btn-line.hover {
+    background: var(--secondary-color, #8bc34a);
+    border-color: var(--secondary-color, #8bc34a);
+}
+
+/* Border Button */
+a.btn-border {
+    display: inline-block;
+    padding: 12px 30px;
+    background: transparent;
+    color: var(--primary-color, #fa6a2e);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 2px solid var(--primary-color, #fa6a2e);
+    border-radius: 4px;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+a.btn-border:hover {
+    background: var(--primary-color, #fa6a2e);
+    color: #fff;
+}
+
+a.btn-border.light {
+    color: #fff;
+    border-color: #fff;
+}
+
+a.btn-border.light:hover {
+    background: #fff;
+    color: var(--primary-color, #fa6a2e);
+}
+
+/* Button Sizes */
+.btn-main.btn-sm,
+.btn-line.btn-sm {
+    padding: 8px 20px;
+    font-size: 12px;
+}
+
+.btn-main.btn-lg,
+.btn-line.btn-lg {
+    padding: 15px 40px;
+    font-size: 16px;
+}
+
+/* Button with Icon */
+.btn-main i,
+.btn-line i {
+    margin-right: 8px;
+}
+
+/* Disabled State */
+.btn-main:disabled,
+.btn-line:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-main:disabled:hover,
+.btn-line:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Button Group */
+.btn-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .btn-main,
+    .btn-line,
+    a.btn-border {
+        padding: 10px 25px;
+        font-size: 13px;
+    }
+
+    .btn-group {
+        gap: 10px;
+    }
+}

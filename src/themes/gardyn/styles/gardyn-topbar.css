@@ -1,0 +1,123 @@
+/* Gardyn Theme - Topbar Styles
+ * Extracted from style.css
+ */
+
+#topbar {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
+}
+
+#topbar.topbar-dark {
+    background: #1a1a1a;
+}
+
+#topbar a {
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+#topbar a:hover {
+    color: #fff;
+}
+
+#topbar a i {
+    margin-right: 8px;
+}
+
+#topbar i {
+    color: var(--tertiary-color, #ffd700);
+}
+
+.topbar-widget {
+    display: inline-block;
+    margin-right: 30px;
+    font-size: 13px;
+}
+
+.topbar-widget:last-child {
+    margin-right: 0;
+}
+
+.topbar-widget a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Social Icons in Topbar */
+#topbar .social-icons {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#topbar .social-icons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    transition: all 0.3s;
+}
+
+#topbar .social-icons a:hover {
+    color: var(--primary-color, #fa6a2e);
+    transform: translateY(-2px);
+}
+
+#topbar .social-icons i {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Hide on small screens */
+.xs-hide {
+    display: block;
+}
+
+/* Topbar hide on scroll */
+header.smaller #topbar {
+    margin-top: -47px;
+    overflow: hidden;
+    opacity: 0;
+}
+
+/* Light Topbar */
+#topbar.topbar-light {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+}
+
+#topbar.topbar-light a {
+    color: #333;
+}
+
+#topbar.topbar-light a:hover {
+    color: var(--primary-color, #fa6a2e);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .xs-hide {
+        display: none !important;
+    }
+
+    #topbar {
+        padding: 8px 0;
+        font-size: 12px;
+    }
+
+    .topbar-widget {
+        margin-right: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    #topbar {
+        display: none;
+    }
+}
