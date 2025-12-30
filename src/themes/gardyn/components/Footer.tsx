@@ -1,16 +1,17 @@
-import Link from 'next/link';
 import React from 'react';
-
-import { getAppVersionFormatted } from '@/core/utils/app-version';
 
 export function Footer() {
   return (
     <footer className="section-dark">
       <div className="container relative z-2">
         <div className="row gx-5">
-          {/* Coluna 1: Logo e Descrição */}
+          {/* Column 1: Logo and Description */}
           <div className="col-lg-4 col-sm-6">
-            <img src="/images/logo-white.webp" className="w-150px" alt="EvoPress Logo" />
+            <img
+              src="https://madebydesignesia.com/themes/gardyn/images/logo-white.webp"
+              className="w-150px"
+              alt="Gardyn Logo"
+            />
             <div className="spacer-20"></div>
             <p>
               Transform your outdoor space with our expert garden services! From design to
@@ -19,25 +20,25 @@ export function Footer() {
             </p>
 
             <div className="social-icons mb-sm-30">
-              <a href="#" aria-label="Facebook">
+              <a href="#">
                 <i className="fa-brands fa-facebook-f"></i>
               </a>
-              <a href="#" aria-label="Twitter">
+              <a href="#">
                 <i className="fa-brands fa-x-twitter"></i>
               </a>
-              <a href="#" aria-label="Instagram">
+              <a href="#">
                 <i className="fa-brands fa-instagram"></i>
               </a>
-              <a href="#" aria-label="YouTube">
+              <a href="#">
                 <i className="fa-brands fa-youtube"></i>
               </a>
-              <a href="#" aria-label="WhatsApp">
+              <a href="#">
                 <i className="fa-brands fa-whatsapp"></i>
               </a>
             </div>
           </div>
 
-          {/* Coluna 2: Links */}
+          {/* Column 2: Links */}
           <div className="col-lg-4 col-sm-12 order-lg-1 order-sm-2">
             <div className="row">
               <div className="col-lg-6 col-sm-6">
@@ -45,22 +46,22 @@ export function Footer() {
                   <h5>Company</h5>
                   <ul>
                     <li>
-                      <Link href="/">Home</Link>
+                      <a href="/">Home</a>
                     </li>
                     <li>
-                      <Link href="/services">Our Services</Link>
+                      <a href="/services">Our Services</a>
                     </li>
                     <li>
-                      <Link href="/projects">Projects</Link>
+                      <a href="/projects">Projects</a>
                     </li>
                     <li>
-                      <Link href="/about">About Us</Link>
+                      <a href="/about">About Us</a>
                     </li>
                     <li>
-                      <Link href="/blog">Blog</Link>
+                      <a href="/blog">Blog</a>
                     </li>
                     <li>
-                      <Link href="/contact">Contact</Link>
+                      <a href="/contact">Contact</a>
                     </li>
                   </ul>
                 </div>
@@ -70,22 +71,22 @@ export function Footer() {
                   <h5>Our Services</h5>
                   <ul>
                     <li>
-                      <Link href="/service/garden-design">Garden Design</Link>
+                      <a href="/service-single">Garden Design</a>
                     </li>
                     <li>
-                      <Link href="/service/maintenance">Garden Maintenance</Link>
+                      <a href="/service-single">Garden Maintenance</a>
                     </li>
                     <li>
-                      <Link href="/service/planting">Planting Services</Link>
+                      <a href="/service-single">Planting Services</a>
                     </li>
                     <li>
-                      <Link href="/service/tree-care">Tree Care</Link>
+                      <a href="/service-single">Tree Care</a>
                     </li>
                     <li>
-                      <Link href="/service/irrigation">Irrigation Services</Link>
+                      <a href="/service-single">Irrigation Services</a>
                     </li>
                     <li>
-                      <Link href="/service/specialty">Specialty Services</Link>
+                      <a href="/service-single">Specialty Services</a>
                     </li>
                   </ul>
                 </div>
@@ -93,7 +94,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Coluna 3: Informações de Contato */}
+          {/* Column 3: Contact Info */}
           <div className="col-lg-4 col-sm-6 order-lg-2 order-sm-1">
             <div className="widget">
               <div className="fw-bold text-white">
@@ -121,15 +122,13 @@ export function Footer() {
           <div className="row">
             <div className="col-md-12">
               <div className="de-flex">
-                <div className="de-flex-col">
-                  Copyright {new Date().getFullYear()} - EvoPress {getAppVersionFormatted()}
-                </div>
+                <div className="de-flex-col">Copyright 2024 - Gardyn by Designesia</div>
                 <ul className="menu-simple">
                   <li>
-                    <Link href="/terms">Terms & Conditions</Link>
+                    <a href="#">Terms & Conditions</a>
                   </li>
                   <li>
-                    <Link href="/privacy">Privacy Policy</Link>
+                    <a href="#">Privacy Policy</a>
                   </li>
                 </ul>
               </div>
@@ -137,8 +136,13 @@ export function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Decorative Image */}
+      <img
+        src="https://madebydesignesia.com/themes/gardyn/images/misc/silhuette-1-black.webp"
+        className="abs bottom-0 op-3"
+        alt=""
+      />
     </footer>
   );
 }
-
-
