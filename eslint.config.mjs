@@ -18,6 +18,7 @@ export default [
       '*.config.ts',
       '*.config.mjs',
       'drizzle/**',
+      'src/themes/gardyn/assets/**',
     ],
   },
   {

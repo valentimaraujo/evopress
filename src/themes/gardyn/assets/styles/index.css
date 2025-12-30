@@ -1,0 +1,9 @@
+/* Gardyn Theme - Main Styles Import
+ * Import all Gardyn theme CSS files
+ */
+
+@import './bootstrap.min.css';
+@import './plugins.css';
+@import './style.css';
+@import './coloring.css';
+@import './colors/scheme-01.css';

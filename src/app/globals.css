@@ -3,11 +3,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
-  --color-background: #ffffff;
-  --color-foreground: #171717;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --theme-primary: #7ba922;
+  --theme-primary-foreground: #ffffff;
+  --theme-secondary: #d2a017;
 }
 
 html.dark {
