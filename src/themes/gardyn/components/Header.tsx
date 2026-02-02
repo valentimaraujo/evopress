@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import { Menu } from './Menu';
 import { Topbar } from "./Topbar";
 
 export function Header() {
@@ -92,38 +93,7 @@ export function Header() {
                 </div>
               </div>
               <div className="de-flex-col header-col-mid">
-
-                <ul id="mainmenu">
-                  <li><a className="menu-item" href="services.html">Services</a>
-                    <ul>
-                      <li><a href="services.html">All Services</a></li>
-                      <li><a href="service-single.html">Service Single</a></li>
-                      <li><a href="pricing-plans.html">Pricing Plans</a></li>
-                      <li><a href="price-list.html">Price List</a></li>
-                    </ul>
-                  </li>
-                  <li><a className="menu-item" href="projects.html">Projects</a>
-                    <ul>
-                      <li><a href="projects.html">Projects Default</a></li>
-                      <li><a href="projects-2.html">Projects 3 Columns</a></li>
-                      <li><a href="projects-3.html">Projects Parallax</a></li>
-                      <li><a href="projects-4.html">Projects Carousel</a></li>
-                      <li><a href="project-single.html">Project Single</a></li>
-                    </ul>
-                  </li>
-                  <li><a className="menu-item" href="#">Pages</a>
-                    <ul>
-                      <li><a href="about.html">About Us</a></li>
-                      <li><a href="team.html">Our Team</a></li>
-                      <li><a href="gallery.html">Gallery</a></li>
-                      <li><a href="gallery-carousel.html">Gallery Carousel</a></li>
-                    </ul>
-                  </li>
-                  <li><a className="menu-item" href="shop-homepage.html">Shop</a></li>
-                  <li><a className="menu-item" href="blog.html">Blog</a></li>
-                  <li><a className="menu-item" href="contact.html">Contact</a></li>
-                </ul>
-
+                <Menu location="header" />
               </div>
               <div className="de-flex-col">
                 <div className="menu_side_area">

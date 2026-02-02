@@ -9,47 +9,31 @@ interface MenuProps {
   location?: string;
 }
 
-function MenuItemComponent({ item, depth = 0 }: { item: MenuItem; depth?: number }) {
-  const [isOpen, setIsOpen] = useState(false);
+function MenuItemComponent({ item }: { item: MenuItem }) {
   const hasChildren = item.children && item.children.length > 0;
+  const href = item.page ? `/page/${item.page.slug}` : item.url || '#';
 
   if (hasChildren) {
     return (
-      <div className="relative group">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-        >
-          <span>{item.label || item.page?.title || 'Item'}</span>
-          <svg
-            className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {isOpen && (
-          <div className="absolute left-0 top-full mt-1 min-w-[200px] rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
-            {item.children!.map((child) => (
-              <MenuItemComponent key={child.uuid} item={child} depth={depth + 1} />
-            ))}
-          </div>
-        )}
-      </div>
+      <li>
+        <Link className="menu-item" href={href}>
+          {item.label || item.page?.title || 'Item'}
+        </Link>
+        <ul>
+          {item.children!.map((child) => (
+            <MenuItemComponent key={child.uuid} item={child} />
+          ))}
+        </ul>
+      </li>
     );
   }
 
-  const href = item.page ? `/page/${item.page.slug}` : item.url || '#';
-
   return (
-    <Link
-      href={href}
-      className="block px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
-    >
-      {item.label || item.page?.title || 'Item'}
-    </Link>
+    <li>
+      <Link className="menu-item" href={href}>
+        {item.label || item.page?.title || 'Item'}
+      </Link>
+    </li>
   );
 }
 
@@ -86,20 +70,15 @@ export function Menu({ location }: MenuProps) {
     fetchMenu();
   }, [location]);
 
-  if (loading) {
-    return null;
-  }
-
-  if (items.length === 0) {
+  if (loading || items.length === 0) {
     return null;
   }
 
   return (
-    <nav className="flex items-center space-x-1">
+    <ul id="mainmenu">
       {items.map((item) => (
         <MenuItemComponent key={item.uuid} item={item} />
       ))}
-    </nav>
+    </ul>
   );
 }
-
