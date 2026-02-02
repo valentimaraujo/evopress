@@ -15,7 +15,15 @@ export async function GET(request: NextRequest) {
         return formatJSONResponse({ menu: null, items: [] });
       }
       const items = await getMenuItems(menu.uuid);
-      return formatJSONResponse({ menu, items });
+
+      const { getReadingSettings } = await import('@/core/services/settings.service');
+      const readingSettings = await getReadingSettings();
+
+      return formatJSONResponse({
+        menu,
+        items,
+        homepagePageUuid: readingSettings.homepagePage
+      });
     }
 
     const menus = await getAllMenus();

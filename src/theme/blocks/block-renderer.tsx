@@ -6,6 +6,7 @@ import { PublicButtonBlock } from './ButtonBlock';
 import { PublicColumnsBlock } from './ColumnsBlock';
 import { PublicDividerBlock } from './DividerBlock';
 import { PublicHeadingBlock } from './HeadingBlock';
+import { PublicHTMLBlock } from './HTMLBlock';
 import { PublicImageBlock } from './ImageBlock';
 import { PublicParagraphBlock } from './ParagraphBlock';
 import { PublicSpacerBlock } from './SpacerBlock';
@@ -26,6 +27,8 @@ export function renderPublicBlock(block: ContentBlock) {
       return <PublicDividerBlock block={block} />;
     case 'columns':
       return <PublicColumnsBlock block={block} />;
+    case 'html':
+      return <PublicHTMLBlock block={block} />;
     default:
       return <div>Tipo de bloco desconhecido: {(block as { type: string }).type}</div>;
   }

@@ -31,6 +31,15 @@ export default async function Home() {
       homepagePage.postType === 'page'
     ) {
       const blocks = (homepagePage.contentBlocks as ContentBlock[]) || [];
+      const hasFullWidth = blocks.some(block => block.fullWidth);
+
+      if (hasFullWidth) {
+        return (
+          <Layout>
+            <PostContent blocks={blocks} />
+          </Layout>
+        );
+      }
 
       return (
         <Layout>

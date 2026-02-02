@@ -6,6 +6,7 @@ import { ButtonBlock } from './blocks/ButtonBlock';
 import { ColumnsBlock } from './blocks/ColumnsBlock';
 import { DividerBlock } from './blocks/DividerBlock';
 import { HeadingBlock } from './blocks/HeadingBlock';
+import { HTMLBlock } from './blocks/HTMLBlock'; // Added import for HTMLBlock
 import { ImageBlock } from './blocks/ImageBlock';
 import { ParagraphBlock } from './blocks/ParagraphBlock';
 import { SpacerBlock } from './blocks/SpacerBlock';
@@ -13,6 +14,7 @@ import { ButtonSettings } from './settings/ButtonSettings';
 import { ColumnsSettings } from './settings/ColumnsSettings';
 import { DividerSettings } from './settings/DividerSettings';
 import { HeadingSettings } from './settings/HeadingSettings';
+import { HTMLSettings } from './settings/HTMLSettings'; // Added import for HTMLSettings
 import { ImageSettings } from './settings/ImageSettings';
 import { ParagraphSettings } from './settings/ParagraphSettings';
 import { SpacerSettings } from './settings/SpacerSettings';
@@ -77,6 +79,14 @@ export function renderBlock(
           onUploadImage={onUploadImage}
         />
       );
+    case 'html':
+      return (
+        <HTMLBlock
+          block={block}
+          isEditing={isEditing}
+          onChange={onChange}
+        />
+      );
     default:
       return <div>Tipo de bloco desconhecido</div>;
   }
@@ -102,6 +112,8 @@ export function renderBlockSettings(
       return <DividerSettings block={block} onChange={onChange} />;
     case 'columns':
       return <ColumnsSettings block={block} onChange={onChange} onUploadImage={onUploadImage} />;
+    case 'html':
+      return <HTMLSettings block={block} onChange={onChange} />;
     default:
       return <div>Tipo de bloco desconhecido</div>;
   }

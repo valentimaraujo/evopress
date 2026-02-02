@@ -5,11 +5,13 @@ export type BlockType =
   | 'button'
   | 'spacer'
   | 'divider'
-  | 'columns';
+  | 'columns'
+  | 'html';
 
 export interface BaseBlock {
   id: string;
   type: BlockType;
+  fullWidth?: boolean;
 }
 
 export interface HeadingBlock extends BaseBlock {
@@ -55,6 +57,11 @@ export interface ColumnsBlock extends BaseBlock {
   columnCount: 2 | 3 | 4;
 }
 
+export interface HTMLBlock extends BaseBlock {
+  type: 'html';
+  content: string;
+}
+
 export type ContentBlock =
   | HeadingBlock
   | ParagraphBlock
@@ -62,7 +69,8 @@ export type ContentBlock =
   | ButtonBlock
   | SpacerBlock
   | DividerBlock
-  | ColumnsBlock;
+  | ColumnsBlock
+  | HTMLBlock;
 
 export interface BlockDefinition {
   type: BlockType;

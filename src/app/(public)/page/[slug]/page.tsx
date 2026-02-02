@@ -33,6 +33,11 @@ export default async function PagePage({ params }: PagePageProps) {
   }
 
   const blocks = (page.contentBlocks as ContentBlock[]) || [];
+  const hasFullWidth = blocks.some(block => block.fullWidth);
+
+  if (hasFullWidth) {
+    return <PostContent blocks={blocks} />;
+  }
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12">

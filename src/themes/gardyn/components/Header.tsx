@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React from 'react';
 
 import { Menu } from './Menu';
@@ -16,10 +17,10 @@ export function Header() {
               <div className="de-flex-col">
 
                 <div id="logo">
-                  <a href="index.html">
+                  <Link href="/">
                     <img className="logo-main" src="https://madebydesignesia.com/themes/gardyn/images/logo-white.webp" alt="" />
                     <img className="logo-mobile" src="https://madebydesignesia.com/themes/gardyn/images/logo-white.webp" alt="" />
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="de-flex-col header-col-mid">
@@ -27,7 +28,7 @@ export function Header() {
               </div>
               <div className="de-flex-col">
                 <div className="menu_side_area">
-                  <a href="contact.html" className="btn-main btn-line">Get In Touch</a>
+                  <Link href="/contact" className="btn-main btn-line">Get In Touch</Link>
                   <span id="menu-btn"></span>
                 </div>
 

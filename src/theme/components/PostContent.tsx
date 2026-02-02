@@ -18,9 +18,12 @@ export function PostContent({ blocks }: PostContentProps) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="py-8">
       {blocks.map((block) => (
-        <div key={block.id}>
+        <div
+          key={block.id}
+          className={block.fullWidth ? "" : "mx-auto max-w-4xl px-4 mb-6"}
+        >
           {renderPublicBlock(block)}
         </div>
       ))}
