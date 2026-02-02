@@ -3,6 +3,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+*,
+html,
+body {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
 :root {
   --theme-primary: #7ba922;
   --theme-primary-foreground: #ffffff;
@@ -11,12 +19,6 @@
 
 html.dark {
   color-scheme: dark;
-}
-
-body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
 /* Tiptap Editor Overrides for Full Height */

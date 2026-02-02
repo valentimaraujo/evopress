@@ -1,7 +1,7 @@
 'use client';
 
 import Script from 'next/script';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import type { Post } from '@/core/services/posts.service';
 
@@ -13,7 +13,6 @@ import '../assets/styles/colors/scheme-01.css';
 
 import { Footer } from './Footer';
 import { Header } from './Header';
-import { Sidebar } from './Sidebar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -23,118 +22,20 @@ interface LayoutProps {
 }
 
 export function Layout({ children: _children, sidebar: _sidebar }: LayoutProps) {
-  useEffect(() => {
-    // Preloader functionality
-    const loader = document.getElementById('de-loader');
-    if (!loader) return;
-
-    // Add loader content only if it doesn't exist
-    if (!loader.querySelector('.lds-roller')) {
-      const loaderContent = document.createElement('div');
-      loaderContent.className = 'lds-roller';
-      for (let i = 0; i < 8; i++) {
-        loaderContent.appendChild(document.createElement('div'));
-      }
-      loader.appendChild(loaderContent);
-    }
-
-    // Function to hide loader
-    const hideLoader = () => {
-      if (loader) {
-        loader.style.opacity = '0';
-        loader.style.transition = 'opacity 0.5s';
-        setTimeout(() => {
-          loader.style.display = 'none';
-        }, 500);
-      }
-    };
-
-    // Hide loader after a short delay to ensure content is rendered
-    const timer = setTimeout(hideLoader, 300);
-
-    // Also hide on window load as fallback
-    window.addEventListener('load', hideLoader);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('load', hideLoader);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Initialize WOW.js for animations (supports dynamic content)
-    // WOW.js is loaded via script tag in public folder
-    const initWow = () => {
-      // Check if WOW is available globally
-      if (typeof window !== 'undefined' && (window as any).WOW) {
-        const WOW = (window as any).WOW;
-        const wow = new WOW({
-          boxClass: 'wow',
-          animateClass: 'animated',
-          offset: 0,
-          mobile: true,
-          live: true, // ← Detects dynamically added elements!
-        });
-
-        wow.init();
-      }
-    };
-
-    // Try to initialize immediately
-    initWow();
-
-    // Also try after a short delay in case script is still loading
-    const timer = setTimeout(initWow, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    // Back to top button functionality
-    const backToTop = document.getElementById('back-to-top');
-    const scrollTrigger = 100;
-
-    const handleScroll = () => {
-      if (!backToTop) return;
-
-      if (window.scrollY > scrollTrigger) {
-        backToTop.classList.add('show');
-        backToTop.classList.remove('hide');
-      } else {
-        backToTop.classList.remove('show');
-        backToTop.classList.add('hide');
-      }
-    };
-
-    // Back to top click handler
-    const handleBackToTopClick = (e: Event) => {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    backToTop?.addEventListener('click', handleBackToTopClick);
-
-    // Initial check
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      backToTop?.removeEventListener('click', handleBackToTopClick);
-    };
-  }, []);
 
   return (
-    <body>
-      {/* Load Animate.css for WOW.js animations */}
+    <div>
+      {/* Original Theme Scripts */}
       <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
         strategy="beforeInteractive"
       />
-
-      {/* Load WOW.js library */}
       <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"
+        src="/themes/gardyn/js/plugins.js"
+        strategy="afterInteractive"
+      />
+      <Script
+        src="/themes/gardyn/js/designesia.js"
         strategy="afterInteractive"
       />
 
@@ -143,7 +44,6 @@ export function Layout({ children: _children, sidebar: _sidebar }: LayoutProps) 
 
         <div id="de-loader"></div>
         <Header />
-        <Sidebar />
 
         <div className="no-bottom no-top" id="content">
           <div id="top"></div>
@@ -156,11 +56,7 @@ export function Layout({ children: _children, sidebar: _sidebar }: LayoutProps) 
                     <div className="de-gradient-edge-top dark"></div>
                     <div
                       className="image"
-                      style={{
-                        background: 'url(https://madebydesignesia.com/themes/gardyn/images/background/6.webp) center',
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat'
-                      }}
+                      data-bgimage="url(https://madebydesignesia.com/themes/gardyn/images/background/6.webp) center"
                     ></div>
 
                     <div className="abs bg-color-2 p-3 py-3 bottom-0 start-0 w-120px text-center m-5 z-2 rounded-1 wow fadeIn" data-wow-delay=".5s">
@@ -238,11 +134,67 @@ export function Layout({ children: _children, sidebar: _sidebar }: LayoutProps) 
 
           </section>
 
+          {_children}
         </div>
 
         <Footer />
       </div>
-    </body>
+
+      {/* overlay content begin */}
+      <div id="extra-wrap" className="text-light">
+        <div id="btn-close">
+          <span></span>
+          <span></span>
+        </div>
+
+        <div id="extra-content">
+          <img src="https://madebydesignesia.com/themes/gardyn/images/logo-white.webp" className="w-150px" alt="" />
+
+          <div className="spacer-30-line"></div>
+
+          <h5>Our Services</h5>
+          <ul className="no-style">
+            <li><a href="service-single.html">Garden Design</a></li>
+            <li><a href="service-single.html">Garden Maintenance</a></li>
+            <li><a href="service-single.html">Planting Services</a></li>
+            <li><a href="service-single.html">Tree Care</a></li>
+            <li><a href="service-single.html">Irrigation Services</a></li>
+            <li><a href="service-single.html">Specialty Services</a></li>
+          </ul>
+
+          <div className="spacer-30-line"></div>
+
+          <h5>Contact Us</h5>
+          <div><i className="icofont-clock-time me-2 op-5"></i>Monday - Friday 08.00 - 18.00</div>
+          <div><i className="icofont-location-pin me-2 op-5"></i>100 S Main St, New York, </div>
+          <div><i className="icofont-envelope me-2 op-5"></i>contact@gardyn.com</div>
+
+          <div className="spacer-30-line"></div>
+
+          <h5>About Us</h5>
+          <p>
+            Transform your outdoor space with our expert garden services! From design to
+            maintenance, we create beautiful, thriving gardens tailored to your vision. Let us
+            bring your dream garden to life—professional, reliable, and passionate about nature.
+          </p>
+
+          <div className="social-icons">
+            <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
+            <a href="#"><i className="fa-brands fa-x-twitter"></i></a>
+            <a href="#"><i className="fa-brands fa-instagram"></i></a>
+            <a href="#"><i className="fa-brands fa-youtube"></i></a>
+            <a href="#"><i className="fa-brands fa-whatsapp"></i></a>
+          </div>
+        </div>
+      </div>
+      {/* overlay content end */}
+
+      <div id="buy-now" className="show-on-scroll">
+        <a className="btn-buy" href="https://themeforest.net/cart/configure_before_adding/54233145" target="_blank">
+          Buy on <img src="https://madebydesignesia.com/themes/gardyn/demo/envato.png" className="" alt="" />
+        </a>
+      </div>
+    </div>
   );
 }
 
