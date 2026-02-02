@@ -1,5 +1,6 @@
 'use client';
 
+import Script from 'next/script';
 import React, { useEffect } from 'react';
 
 import type { Post } from '@/core/services/posts.service';
@@ -21,7 +22,7 @@ interface LayoutProps {
   };
 }
 
-export function Layout({ children, sidebar }: LayoutProps) {
+export function Layout({ children: _children, sidebar: _sidebar }: LayoutProps) {
   useEffect(() => {
     // Preloader functionality
     const loader = document.getElementById('de-loader');
@@ -61,6 +62,34 @@ export function Layout({ children, sidebar }: LayoutProps) {
   }, []);
 
   useEffect(() => {
+    // Initialize WOW.js for animations (supports dynamic content)
+    // WOW.js is loaded via script tag in public folder
+    const initWow = () => {
+      // Check if WOW is available globally
+      if (typeof window !== 'undefined' && (window as any).WOW) {
+        const WOW = (window as any).WOW;
+        const wow = new WOW({
+          boxClass: 'wow',
+          animateClass: 'animated',
+          offset: 0,
+          mobile: true,
+          live: true, // ← Detects dynamically added elements!
+        });
+
+        wow.init();
+      }
+    };
+
+    // Try to initialize immediately
+    initWow();
+
+    // Also try after a short delay in case script is still loading
+    const timer = setTimeout(initWow, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     // Back to top button functionality
     const backToTop = document.getElementById('back-to-top');
     const scrollTrigger = 100;
@@ -97,6 +126,18 @@ export function Layout({ children, sidebar }: LayoutProps) {
 
   return (
     <body>
+      {/* Load Animate.css for WOW.js animations */}
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+        strategy="beforeInteractive"
+      />
+
+      {/* Load WOW.js library */}
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"
+        strategy="afterInteractive"
+      />
+
       <div id="wrapper">
         <a href="#" id="back-to-top"></a>
 
@@ -113,7 +154,14 @@ export function Layout({ children, sidebar }: LayoutProps) {
 
                   <div className="col-lg-6 position-lg-absolute right-half h-100">
                     <div className="de-gradient-edge-top dark"></div>
-                    <div className="image" data-bgimage="url(https://madebydesignesia.com/themes/gardyn/images/background/6.webp) center"></div>
+                    <div
+                      className="image"
+                      style={{
+                        background: 'url(https://madebydesignesia.com/themes/gardyn/images/background/6.webp) center',
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat'
+                      }}
+                    ></div>
 
                     <div className="abs bg-color-2 p-3 py-3 bottom-0 start-0 w-120px text-center m-5 z-2 rounded-1 wow fadeIn" data-wow-delay=".5s">
                       <h2 className="fs-72 mb-1">25</h2>
