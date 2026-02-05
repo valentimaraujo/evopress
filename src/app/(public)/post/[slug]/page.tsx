@@ -34,7 +34,12 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const blocks = (post.contentBlocks as ContentBlock[]) || [];
+  const hasFullWidth = blocks.some(block => block.fullWidth);
   const recentPosts = await getRecentPosts(5, post.uuid);
+
+  if (hasFullWidth) {
+    return <PostContent blocks={blocks} />;
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">

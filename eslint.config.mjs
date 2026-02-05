@@ -18,7 +18,9 @@ export default [
       '*.config.ts',
       '*.config.mjs',
       'drizzle/**',
-      'src/themes/gardyn/assets/**',
+      'src/themes/**/assets/**',
+      'public/themes/**/**',
+      'modelo/**',
     ],
   },
   {
@@ -72,7 +74,6 @@ export default [
 
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-shadow': 'off',
-      '@typescript-eslint/no-unused-vars': 'error',
 
       '@next/next/no-img-element': 'off',
       '@next/next/no-sync-scripts': 'off',

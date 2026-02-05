@@ -9,6 +9,7 @@ import type {
   ImageBlock,
   ParagraphBlock,
   SpacerBlock,
+  HTMLBlock,
 } from './types';
 
 function createDefaultHeading(): Omit<HeadingBlock, 'id'> {
@@ -67,6 +68,14 @@ function createDefaultColumns(): Omit<ColumnsBlock, 'id'> {
   };
 }
 
+function createDefaultHTML(): Omit<HTMLBlock, 'id'> {
+  return {
+    type: 'html',
+    content: '<section>\n  <div class="container">\n    <h2>Seu HTML aqui</h2>\n  </div>\n</section>',
+    fullWidth: true,
+  };
+}
+
 export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
   heading: {
     type: 'heading',
@@ -109,6 +118,12 @@ export const BLOCK_DEFINITIONS: Record<BlockType, BlockDefinition> = {
     label: 'Colunas',
     icon: '▥',
     defaultData: createDefaultColumns(),
+  },
+  html: {
+    type: 'html',
+    label: 'HTML Puro',
+    icon: '</>',
+    defaultData: createDefaultHTML(),
   },
 };
 

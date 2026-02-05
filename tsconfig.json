@@ -38,9 +38,8 @@
   ],
   "exclude": [
     "node_modules",
-    "public/themes/gardyn/css",
-    "public/themes/gardyn/js",
-    "public/themes/gardyn/images",
-    "public/themes/gardyn/fonts"
+    "src/themes/**/assets/**",
+    "public/themes/**/**",
+    "modelo/**"
   ]
 }

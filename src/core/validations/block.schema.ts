@@ -36,3 +36,8 @@ export const columnsBlockSchema = yup.object({
   columnCount: yup.number().oneOf([2, 3, 4], 'Número de colunas inválido').required(),
   columns: yup.array().of(yup.object()).required(),
 });
+
+export const htmlBlockSchema = yup.object({
+  content: yup.string().required('Conteúdo HTML é obrigatório'),
+  fullWidth: yup.boolean(),
+});

@@ -14,7 +14,7 @@ interface TopbarProps {
     };
 }
 
-export function Topbar({ phone, address, email, socialLinks }: TopbarProps) {
+export function Topbar({ phone: _phone, address: _address, email: _email, socialLinks: _socialLinks }: TopbarProps) {
     return (
         <div id="topbar">
             <div className="container">
