@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Heebo, Plus_Jakarta_Sans } from "next/font/google";
 
 import "./globals.css";
